@@ -1,0 +1,300 @@
+
+body {
+    font-family:"Lucida Grande",Tahoma,Verdana,sans-serif;
+    font-size: 10pt;
+    padding: 0;
+    margin:0;
+}
+
+h2, h3, h4{
+    color: #282828;
+}
+
+pre, code {
+    font-family: consolas,'lucida console','bitstream vera sans mono','courier new',monospace;
+}
+
+a, a:active, a:visited {
+    color: #679fda;
+    text-decoration: none;
+    
+}
+
+a:hover {
+    color: #679fda;
+    text-decoration: none;
+    border-bottom: 1px dotted #679fda;
+}
+
+abbr {
+    border: none;
+}
+
+div#wrapper{
+    margin: 0 auto;
+    width: 900px;
+    position: relative;
+    /*background: #f5f5f5;*/
+}
+
+div#header{
+    text-align:left;
+    /*background: transparent url('../images/topbar.png') no-repeat;*/
+    padding: 25px 0 30px 120px;
+}
+
+div#header a{
+    border: none;
+}
+
+div#footer{
+    text-align:left;
+    /*background: transparent url('../images/bottbar.png') bottom left no-repeat;*/
+    padding: 25px 0 15px 120px;
+    /*height: 90px;
+    background: #292929;*/
+}
+
+div#footer .copy {
+    font-size: .8em;
+    color: #777;
+}
+
+#blog-title{
+    margin: 0;
+}
+
+#nav-above{
+    display: none;
+}
+
+div#container {
+    width: 725px;
+}
+
+div#content {
+    margin:0 0 0 0;
+}
+
+.page-title {
+    margin-top: 0;
+    padding-top: 0;
+    font-size: 20pt;
+    margin-bottom:25px;
+    margin-left:120px;
+}
+
+/*** FRONT ****/
+
+div.front-page-text {
+    margin:0 0 0px 120px;
+}
+
+div.front-page-text p {
+    margin: 0 0 1em 0;	
+    color: #444;
+    text-align: justify; 
+    text-justify: newspaper;
+}
+
+#front-page-container a:hover{
+	border: none;
+}
+
+.bigline {
+	margin: 0;
+	height: 80px;
+}
+
+.bigline .icon{
+	float: left;
+	margin: 23px 0 0 40px;
+}
+
+.bigline .subject{
+	margin-left: 118px;
+	font-family: "Arial Black", Arial;
+	font-size: 60px;
+}
+
+.bigline .subject a {
+    color: #282828;
+}
+
+.bigline .subject a:hover {
+    color: #000;
+}
+
+/*** FRONT END ****/
+
+/*** ENTRY ****/
+div.entry {
+    margin:0 0 25px 120px;
+}
+
+div.entry p {
+    margin: 0 0 1em 0;	
+    color: #444;
+    text-align: justify; 
+    text-justify: newspaper;
+}
+
+div.entry-date, div.entry-image {
+    float: left;
+    width: 84px;
+    height: 67px;
+    margin: 6px 0 0 25px;
+    background: transparent url('../images/datebox.png') top left no-repeat;
+}
+
+div.entry-date {
+    background: transparent url('../images/datebox.png') top left no-repeat;
+}
+
+.entry-title{
+    color: #282828;
+    font-family:'Arial Black',"Lucida Grande",Tahoma,Verdana,sans-serif;
+    font-size: 15pt;
+    font-weight: bold;
+    text-transform:uppercase;
+    margin: 0 0 5px 0;
+    padding: 0;
+    letter-spacing: -1px;
+}
+
+.entry-title a {
+    color: #282828;
+    text-decoration: none;
+    border: none;
+}
+
+.entry-title a:hover {
+    color: #000;
+    text-decoration: none;
+}
+
+.entry-content {
+	font-size: 10pt;
+}
+
+pre.prettyprint, pre.command {
+    padding: 10px;
+    border: 1px dashed #ddd;
+    background: #fbfbfb;
+    font-size: 9pt;
+    overflow-x: auto;
+}
+
+.entry .edit-link a, .entry .edit-link a:hover{
+    color: #c1270f;
+    font-weight: bold;
+    text-decoration: none;
+    letter-spacing: 0;
+    font-size: .6em;
+    text-transform:none;
+    border: none;
+}
+
+.meta-sep{
+    font-size: 1.2em;
+    line-height: 1em;
+    color: #bbb;
+}
+
+.entry-meta {
+    font-size: .8em;
+}
+
+.entry-datetime, .entry-comment-links {
+    margin-left: 120px;
+    /*margin: 30px 0 30px 120px;*/
+    color: #777;
+}
+
+.entry-comment-links{
+    margin-bottom: 25px;
+}
+
+.entry-datetime{
+    margin-top: 30px;
+    clear: right;
+}
+
+
+/** search **/
+
+#searchform {
+    background: transparent url('../images/search.png') no-repeat;
+    height: 32px;
+}
+
+#searchform div {
+    padding: 5px 0 0 4px;
+}
+
+#searchform #s {
+    width: 118px;
+    height: 20px;
+    
+    border: none;
+}
+
+#searchform .button {
+    width: 21px;
+    height: 18px;
+    border: none;
+    background: none;
+    padding: 0;
+}
+
+/*********ENTRY END ***********/
+
+
+/*********** SIDEBAR ***********/
+
+div#sidebar {
+    float: right;
+    
+    padding-top: 17px;
+    *padding-top: 30px;
+    width:155px;
+}
+
+#sidebar ul {
+    padding: 0;
+    margin-left: 0;
+}
+
+#sidebar .sidebar-list {
+
+}
+
+#sidebar .sidebar-list li {
+    list-style:none;
+    margin-left: 0;
+}
+
+#sidebar .sidebar-list li h3 {
+    font-family: "Arial Black", Arial;
+    font-size: 14pt;
+    font-weight: bold;
+    margin-bottom: 0px;
+    margin-top: 5px;
+}
+
+#sidebar .sidebar-list li h3 a {
+    color: #282828;
+}
+
+#sidebar .sidebar-list li h3 a:hover {
+    color: #000;
+}
+
+
+
+div#footer {
+	clear:both;
+}
+
+
+
