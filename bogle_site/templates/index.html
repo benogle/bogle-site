@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Ben Ogle on the web{% endblock %}
+
+{% block description %}{{ page.description }}{% endblock %}
+
+{% block keywords %}{{ page.description }}{% endblock %}
+
+{% block head-img %}{{ page.header_image.geturl }}{% endblock %}
+
+{% block sidebar %}{% endblock %}
+
+{% block content %}
+
+<div class="front-page-text">
+	<p>{{ page.content }}</p>
+</div>
+
+<div id="front-page-container">
+	<div class="bigline">
+		<div class="icon">
+			<a href="http://blog.benogle.com"><img src="/smedia/img/accentblog_sm.png" border="0"/></a>
+		</div>
+		<div class="subject">
+			<a href="http://blog.benogle.com">blog</a>
+		</div>
+	</div>
+
+	<div class="bigline">
+		<div class="icon">
+			<a href="/projects"><img src="/smedia/img/accentproj_sm.png" border="0"/></a>
+		</div>
+		<div class="subject">
+			<a href="/projects">projects</a>
+		</div>
+	</div>
+
+	<div class="bigline">
+		<div class="icon">
+			<a href="/about"><img src="/smedia/img/accentabout_sm.png" border="0"/></a>
+		</div>
+		<div class="subject">
+			<a href="/about">about</a>
+		</div>
+	</div>
+
+	<div class="bigline">
+		<div class="icon">
+			<a href="/contact"><img src="/smedia/img/accentcontact_sm.png" border="0"/></a>
+		</div>
+		<div class="subject">
+			<a href="/contact">contact</a>
+		</div>
+	</div>
+</div>
+
+{% endblock %}

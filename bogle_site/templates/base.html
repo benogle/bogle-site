@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <link rel="stylesheet" href="/smedia/css/main.css" />
+    <title>{% block title %}Ben Ogle on the web{% endblock %}</title>
+    <meta name="description" content="{% block description %}Ben Ogle is an american computer programmer.{% endblock %}" />
+    <meta name="keywords" content="{% block keywords %}ben ogle, awesome, bre, python, c#, jquery{% endblock %}" />
+</head>
+
+<body>
+	<div id="wrapper">
+
+		<div id="header">
+			<h1 id="blog-title">
+				<a href="/" title="Ben Ogle Home" rel="home">
+					<img src="{% block head-img %}/smedia/img/headindex.png{% endblock %}" border="0" />
+				</a>
+			</h1>
+		</div><!--  #header -->
+
+		<div id="sidebar">
+			{% block sidebar %}{% endblock %}
+		</div>
+
+		<div id="container">
+			<div id="content">
+
+				{% block content %}{% endblock %}
+
+			</div><!-- #content -->
+		</div><!-- #container -->
+
+		<div id="footer">
+			<div class="copy">Awesomeness is copyright 2009 ben ogle. Anything on here that's crap is public domain.</div>
+		</div><!-- #footer -->
+
+	</div><!-- #wrapper -->
+
+</body>
+</html>
