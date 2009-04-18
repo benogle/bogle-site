@@ -17,7 +17,7 @@ pre, code {
 a, a:active, a:visited {
     color: #679fda;
     text-decoration: none;
-    
+    outline: 0;
 }
 
 a:hover {
@@ -45,6 +45,7 @@ div#header{
 
 div#header a{
     border: none;
+    outline: 0;
 }
 
 div#footer{
@@ -68,11 +69,11 @@ div#footer .copy {
     display: none;
 }
 
-div#container {
+#wrapper div#container {
     width: 725px;
 }
 
-div#content {
+#wrapper div#content {
     margin:0 0 0 0;
 }
 
@@ -86,8 +87,22 @@ div#content {
 
 /*** FRONT ****/
 
+#front-page {
+	margin: 0 auto;
+	width: 440px;
+    position: relative;
+}
+
+#front-page #sidebar {
+    display: none;
+}
+
+#front-page #header, #front-page #footer {
+	padding-left: 0px;
+}
+
 div.front-page-text {
-    margin:0 0 0px 120px;
+    /*margin:0 0 0px 120px;*/
 }
 
 div.front-page-text p {
@@ -102,23 +117,24 @@ div.front-page-text p {
 }
 
 .bigline {
-	margin: 0;
+	/*margin-left: 120px;*/
 	height: 80px;
 }
 
 .bigline .icon{
 	float: left;
-	margin: 23px 0 0 40px;
+	margin: 23px 0 0 0px;
 }
 
 .bigline .subject{
-	margin-left: 118px;
+	margin-left: 80px;
 	font-family: "Arial Black", Arial;
 	font-size: 60px;
 }
 
 .bigline .subject a {
     color: #282828;
+    outline: 0;
 }
 
 .bigline .subject a:hover {

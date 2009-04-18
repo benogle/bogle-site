@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from simplesite import textile
 
 # Create your models here.
 class Sidebar(models.Model):
@@ -8,6 +9,9 @@ class Sidebar(models.Model):
     
     def __unicode__(self):
         return self.name
+    
+    def gethtml(self):
+        return textile.textile(self.content)
     
 class Image(models.Model):
     name = models.CharField(max_length=30)
@@ -31,3 +35,6 @@ class Page(models.Model):
     
     def __unicode__(self):
         return self.title
+        
+    def gethtml(self):
+        return textile.textile(self.content)

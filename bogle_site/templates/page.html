@@ -8,7 +8,7 @@
 
 {% block head-img %}{{ page.header_image.geturl }}{% endblock %}
 
-{% block sidebar %}{{ page.sidebar.content }}{% endblock %}
+{% block sidebar %}{{ page.sidebar.content|safe }}{% endblock %}
 
 {% block content %}
 
@@ -20,7 +20,7 @@
 	<div class="entry">
 		<h2 class="entry-title">{{ page.title }}</h2>
 		<div class="entry-content">
-			{{ page.content }}
+			{{ page.gethtml|safe }}
 		</div>
 
 	</div>
