@@ -35,6 +35,16 @@ LANGUAGE_CODE = 'en-us'
 SITE_ID = 1
 
 INDEX_PAGE_ID = 1
+CONTACT_PAGE_ID = 2
+
+#EMail settings for contact form....
+EMAIL_CONTACT_SENDER = 'noreply@benogle.com'
+EMAIL_CONTACT_RECIPIENT = 'ben@benogle.com'
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 1025
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+EMAIL_USE_TLS = False
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.

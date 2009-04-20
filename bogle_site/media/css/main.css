@@ -150,8 +150,14 @@ div.entry {
 
 div.entry p {
     margin: 0 0 1em 0;	
-    color: #444;
+    color: #111;
     text-align: justify; 
+    text-justify: newspaper;
+}
+
+div.entry ul li {
+	color: #111;
+	text-align: justify; 
     text-justify: newspaper;
 }
 
@@ -236,6 +242,56 @@ pre.prettyprint, pre.command {
     clear: right;
 }
 
+/** contact form **/
+
+#contactform{
+
+}
+
+#contactform .field-wrapper{
+	margin: 5px 0;
+	padding: 5px;
+}
+
+#contactform .field-wrapper label{
+	width: 70px;
+	margin-right: 10px;
+	padding-top: 2px;
+	float: left;
+	text-align: right;
+	font-weight: bold;
+}
+
+#contactform .field-error{
+	padding: 10px 5px;
+	background: #FFE8E8;
+}
+
+#contactform .field-error ul.errorlist{
+	margin: 0 0 0 80px;
+	padding: 0;
+	list-style:none;
+}
+
+#contactform .field-error ul.errorlist li{
+	list-style:none;
+	margin: 0;
+	padding: 0;
+	color: #c00;
+	font-weight: bold;
+}
+
+#contactform .field-wrapper input {
+	width: 400px;
+}
+
+#contactform .field-wrapper textarea {
+	width: 450px;
+}
+
+#contactform .field-wrapper input.button {
+	width: auto;
+}
 
 /** search **/
 
