@@ -2,7 +2,7 @@
 from django.conf import settings
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse
-from django.core import serializers
+from django.utils import simplejson as json
 from django import forms
 
 from smtplib import SMTPException
@@ -58,7 +58,7 @@ def contactpost_async(req):
     """
     
     form, status = contactpost(req)
-    return HttpResponse(serializers.serialize("json"), status)
+    return HttpResponse(json.dumps(status))
 
 
 def contact(req):

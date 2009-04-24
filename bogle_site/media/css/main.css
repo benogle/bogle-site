@@ -253,7 +253,7 @@ pre.prettyprint, pre.command {
 	padding: 5px;
 }
 
-#contactform .field-wrapper label{
+#contactform .field-wrapper label.field-label{
 	width: 70px;
 	margin-right: 10px;
 	padding-top: 2px;
@@ -263,8 +263,7 @@ pre.prettyprint, pre.command {
 }
 
 #contactform .field-error{
-	padding: 10px 5px;
-	background: #FFE8E8;
+	/*padding: 10px 5px;*/
 }
 
 #contactform .field-error ul.errorlist{

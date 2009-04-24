@@ -13,7 +13,9 @@
 {% block scriptfiles %}
 <script type="text/javascript" src="/smedia/js/jquery.form.js"></script>
 <script type="text/javascript" src="/smedia/js/jquery.validate.js"></script>
+<script type="text/javascript" src="/smedia/js/site.contact.js"></script>
 {% endblock %}
+
 
 {% block content %}
 
@@ -41,26 +43,27 @@
 			{% else %}
 				{{ page.gethtml|safe }}
 
-				<form action="/contact" method="POST">
+				<form id="contact" action="/contact" method="POST">
 					<div id="contactform">
 						<div class="field-wrapper {% if form.sender.errors %}field-error{% endif %}"  >
 							{{ form.sender.errors }}
-							<label for="id_sender">your email</label>
+							<label class="field-label" for="id_sender">your email</label>
 							{{ form.sender }}
 						</div>
 						<div class="field-wrapper {% if form.subject.errors %}field-error{% endif %}">
 							{{ form.subject.errors }}
-							<label for="id_subject">subject</label>
+							<label class="field-label" for="id_subject">subject</label>
 							{{ form.subject }}
 						</div>
 						<div class="field-wrapper {% if form.message.errors %}field-error{% endif %}">
 							{{ form.message.errors }}
-							<label for="id_message">message</label>
+							<label class="field-label" for="id_message">message</label>
 							{{ form.message }}
 						</div>
 						<div class="field-wrapper">
-							<label></label>
+							<label class="field-label" ></label>
 							<input type="submit" class="button" value="Send" />
+							<img src="/smedia/img/loading.gif" id="load-image" style="display:none" />
 						</div>
 					</div>
 				</form>
