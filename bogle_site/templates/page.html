@@ -10,6 +10,16 @@
 
 {% block sidebar %}{{ page.sidebar.content|safe }}{% endblock %}
 
+{% block scriptfiles %}<link rel="stylesheet" href="/smedia/css/jquery.fancybox.css" />{% endblock %}
+
+{% block script %}
+
+$(document).ready(function(){
+	$('a.pic-group').fancybox();
+});
+
+{% endblock %}
+
 {% block content %}
 
 <div class="entry-page">

@@ -199,6 +199,15 @@ div.entry-date {
 	font-size: 10pt;
 }
 
+.entry-content .pic-fit{
+	width: 605px;
+	border: none;
+}
+
+.entry-content a.pic-group:hover{
+	border: none;
+}
+
 pre.prettyprint, pre.command {
     padding: 10px;
     border: 1px dashed #ddd;
