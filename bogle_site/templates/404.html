@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Page not found!{% endblock %}
+
+{% block description %}{% endblock %}
+
+{% block keywords %}{% endblock %}
+
+{% block head-img %}/smedia/img/headindex.png{% endblock %}
+
+{% block sidebar %}
+
+<ul class="sidebar-list">
+	<li>
+		<h3>
+			<a href="/">home</a>
+		</h3>
+	</li>
+</ul>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="entry-page">
+	<div class="entry-image">
+		<img src="/smedia/img/accentbroken.png" alt="fluff image"/>
+	</div>
+
+	<div class="entry">
+		<h2 class="entry-title">Oh Noes!</h2>
+		<div class="entry-content">
+
+			<p>Hey, I couldnt find <strong>{{ request_path }}</strong>!</p>
+
+		</div>
+
+	</div>
+</div>
+
+{% endblock %}
