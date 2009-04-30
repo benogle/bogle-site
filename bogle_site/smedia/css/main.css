@@ -1,7 +1,7 @@
 
 body {
-    font-family:"Lucida Grande",Tahoma,Verdana,sans-serif;
-    font-size: 11pt;
+    font-family: Arial,Tahoma,Verdana,sans-serif;
+    font-size: 12pt;
     padding: 0;
     margin:0;
 }
@@ -66,6 +66,48 @@ div#footer .copy {
     font-size: .7em;
     color: #777;
 }
+
+/*******************/
+
+#ieerr {
+	background: #d40000;
+	color: #fff;
+	float: right;
+	width: 320px;
+	font-size: .8em;
+	margin-right: 175px;
+}
+
+*html #ieerr {
+       margin-right: 87px;
+}
+
+#ieerr h3{
+	color: #fff;
+	margin: 5px 0 10px 0;
+	padding-left: 10px;
+	
+}	
+
+#ieerr p{
+	padding: 0 10px;
+	margin-bottom: 0;
+}
+
+#ieerr a, #ieerr a:hover, #ieerr a:visited, #ieerr a:active{
+	color: #f4c253;
+}
+
+#ieerr a:hover{
+	border-bottom: 1px dotted #f4c253;
+}
+
+#ieerr .ieerr-bottom{
+	background: transparent url('/smedia/img/errborder.png') bottom left no-repeat;
+	height: 10px;
+}
+
+/********************/
 
 #blog-title{
     margin: 0;
@@ -173,6 +215,10 @@ div.entry-date, div.entry-image {
     height: 67px;
     margin: 6px 0 0 25px;
     background: transparent url('../images/datebox.png') top left no-repeat;
+}
+
+*html div.entry-date, *html div.entry-image {
+   margin-left: 15px;
 }
 
 div.entry-date {

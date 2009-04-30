@@ -18,6 +18,23 @@
 
 <body>
 	<div id="{% block wrapperid %}wrapper{% endblock %}">
+		<!--[if IE 6]>
+		{% block ieblock %}
+		<div id="ieerr">
+			<h3>Internet Explorer 6 is <i>evil.</i></h3>
+			<p>
+				Please help advance the web and
+				<a href="http://www.microsoft.com/windows/internet-explorer/worldwide-sites.aspx">upgrade</a>
+				your browser or use a modern alternative such as
+				<a href="http://www.getfirefox.net/download.html">Firefox</a>,
+				<a href="http://www.opera.com/">Opera</a>,
+				<a href="http://www.apple.com/safari/">Safari</a>, or
+				<a href="http://www.google.com/chrome">Chrome</a>.
+			</p>
+			<div class="ieerr-bottom"></div>
+		</div>
+		{% endblock %}
+		<![endif]-->
 
 		<div id="header">
 			<h1 id="blog-title">
