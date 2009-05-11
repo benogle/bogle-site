@@ -1,0 +1,282 @@
+{% extends "base.html" %}
+
+{% block title %}List Adder Demo{% endblock %}
+
+{% block description %}{% endblock %}
+
+{% block keywords %}{% endblock %}
+
+{% block head-img %}/smedia/img/headproj.png{% endblock %}
+
+{% block sidebar %}
+<!-- <ul class="sidebar-list">
+	<li><h3><a href="/demo">demo home</a></h3></li>
+</ul> -->
+{% endblock %}
+
+{% block scriptfiles %}
+<style>
+	.myitem{
+		padding: 0 10px;
+		margin: 1px 0;
+		border: 1px dashed #ddd;
+	}
+
+	#mylistapp .myitem{
+		margin: 10px 0;
+	}
+
+	#mylistsort .myitem h3{
+		cursor: move;
+	}
+
+	.myitem h3{
+		margin-top: 10px;
+	}
+
+	.myitem p{
+		margin-bottom: 10px;
+	}
+
+	ul.errorlist{
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	ul.errorlist li{
+		color: #f00 !important;
+		margin: 0;
+		list-style: none;
+	}
+
+	a.ila-item-insert{
+		display: block;
+		height: 10px;
+	}
+	a.ila-item-insert:hover{
+		background: #ccc;
+		border:0;
+	}
+
+	form {
+		border: 1px dashed #B7BEFF;
+		padding: 10px;
+		margin: 10px 0;
+	}
+</style>
+
+<script type="text/javascript" src="/smedia/js/jquery.form.js"></script>
+<script type="text/javascript" src="/smedia/js/jquery.hotkeys-0.7.9.js"></script>
+<script type="text/javascript" src="/smedia/js/jquery.inplaceform.js"></script>
+<script type="text/javascript" src="/smedia/js/jquery-ui-1.7.1.custom.min.js"></script>
+{% endblock %}
+
+{% block script %}
+
+$(document).ready(function(){
+
+	$.inplaceForm.defaultImage = '/smedia/img/loading.gif';
+	var errSel = {
+		subject:'.subjectError',
+		message:'.messageError'
+	};
+
+	var adder = $('#myform').inplaceListAdder('#mylist', {
+		errorSelectors: errSel
+	});
+
+	var adderapp = $('#myformapp').inplaceListAdder('#mylistapp', {
+		mode: 'append',
+		errorSelectors: errSel
+	});
+
+	var addersort = $('#myformsort').inplaceListAdder('#mylistsort', {
+		errorSelectors: errSel
+	});
+
+	$('#mylistsort').sortable({
+		items: '.ila-item',
+		handle: 'h3',
+		cursor: 'move',
+		update: function(){
+			addersort.fixIndices();
+		}
+	});
+});
+
+{% endblock %}
+
+{% block content %}
+
+<div class="entry-page">
+	<div class="entry-image">
+	</div>
+
+	<div class="entry">
+		<h2 class="entry-title">Inplace List Adder demo</h2>
+		<div class="entry-content">
+
+		<p>InplaceListAdder is a jQuery plugin that simplifies the code for inplace
+		list additions. Do you have comments that need to be added asynchronously? Maybe
+		you need to be able to add an item between two existing items, a la google notebook.
+		InplaceListAdder is here to help.</p>
+
+		<h3>Insert mode</h3>
+
+		<p>InplaceListAdder's insert mode places links in between each pair of existing items.
+		Upon link click, your form will be moved into position. When the form is submitted, your
+		new item will be inserted into the list.</p>
+
+		<p>Your server code knows where to put the new item by way of a hidden element called
+		'ila-item-index' that is injected into your form.</p>
+
+
+<pre class="prettyprint">
+var adder = $('#myform').inplaceListAdder('#mylist', {
+	mode: 'insert',
+	errorSelectors: {
+		subject:'.subjectError',
+		message:'.messageError'
+	}
+});
+</pre>
+
+		<p>Click the bars in between each item and write your new item. Or you can submit the
+		form with no data. The plugin handles any errors from the server. Also, note the use of Ctrl+s to
+		submit to the server.</p>
+
+		<div id="mylist">
+			<div class="myitem">
+				<h3>header</h3>
+				<p>This is an item0!!!</p>
+			</div>
+
+			<div class="myitem">
+				<h3>header</h3>
+				<p>This is an item1!!!</p>
+			</div>
+
+			<div class="myitem">
+				<h3>header</h3>
+				<p>This is an item2!!!</p>
+			</div>
+		</div>
+
+		<form id="myform" action="/demo/listadd/add" method="POST">
+			<div class="subjectError error"></div>
+			<div>{{ form.subject }}</div>
+			<div class="messageError error"></div>
+			<div>{{ form.message }}</div>
+			<div>
+				<input type="submit"/> <span class="loading"></span>
+				<a href="#" class="cancel" >cancel</a>
+			</div>
+		</form>
+
+
+
+		<h3>Sortable insert mode</h3>
+
+		<p>The plugin can be combined with
+		<a href="http://docs.jquery.com/UI/API/1.7.1/Sortable">UI.Sortable</a>
+		to create a sortable list with the ability to add new items in between
+		at any time.</p>
+
+		<p>This takes a little more code as we need to update the form insertion links
+		after the user is done sorting an item. This is done with a call to inplaceListAdder.fixIndices().</p>
+
+<pre class="prettyprint">
+var addersort = $('#myformsort').inplaceListAdder('#mylistsort', {
+	mode: 'insert',
+	errorSelectors: {
+		subject:'.subjectError',
+		message:'.messageError'
+	}
+});
+
+$('#mylistsort').sortable({
+	items: '.ila-item',
+	handle: 'h3',
+	cursor: 'move',
+	update: function(){
+		addersort.fixIndices();
+	}
+});
+</pre>
+
+<p>Grab onto the text header of the following items and move them around!</p>
+
+		<div id="mylistsort">
+			<div class="myitem">
+				<h3>sortable item</h3>
+				<p>This is a sortable item! 0</p>
+			</div>
+
+			<div class="myitem">
+				<h3>sortable item</h3>
+				<p>This is a sortable item! 1</p>
+			</div>
+
+			<div class="myitem">
+				<h3>sortable item</h3>
+				<p>This is a sortable item! 2</p>
+			</div>
+		</div>
+
+		<form id="myformsort" action="/demo/listadd/add" method="POST">
+			<div class="subjectError error"></div>
+			<div>{{ form.subject }}</div>
+			<div class="messageError error"></div>
+			<div>{{ form.message }}</div>
+			<div>
+				<input type="submit"/> <span class="loading"></span>
+				<a href="#" class="cancel" >cancel</a>
+			</div>
+		</form>
+
+
+
+		<h3>Append mode</h3>
+
+		<p>Append mode simply appends your new item onto the end of the list.</p>
+
+<pre class="prettyprint">
+var adder = $('#myformapp').inplaceListAdder('#mylistapp', {
+	mode: 'append',
+	errorSelectors: {
+		subject:'.subjectError',
+		message:'.messageError'
+	}
+});
+</pre>
+
+		<div id="mylistapp">
+			<div class="myitem">
+				<h3>header</h3>
+				<p>This is an item0!!!</p>
+			</div>
+
+			<div class="myitem">
+				<h3>header</h3>
+				<p>This is an item1!!!</p>
+			</div>
+
+			<div class="myitem">
+				<h3>header</h3>
+				<p>This is an item2!!!</p>
+			</div>
+		</div>
+
+		<form id="myformapp" action="/demo/listadd/add" method="POST">
+			<div class="subjectError error"></div>
+			<div>{{ form.subject }}</div>
+			<div class="messageError error"></div>
+			<div>{{ form.message }}</div>
+			<div><input type="submit"/> <span class="loading"></span></div>
+		</form>
+
+		</div>
+	</div>
+</div>
+
+{% endblock %}
