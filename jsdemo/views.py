@@ -35,3 +35,32 @@ def listadd_add(req):
         
     return HttpResponse(json.dumps(status))
     
+    
+def listedit_index(req):
+    return render_to_response('demo_listedit.html', {'form':ListAddForm()})
+    
+    
+def listedit_edit(req):
+    form = ListAddForm(req.POST)
+    
+    if form.is_valid():
+        subject = form.cleaned_data['subject']
+        message = form.cleaned_data['message']
+        
+        status = { 
+            'success': True, 
+            'item': '<div class="myitem"><h3>%s</h3><p>%s</p></div>' % (subject, message)
+        }
+        
+        
+    else:
+        errs = {}
+        for k in form.errors.keys():
+            errs[k] = str(form.errors[k])
+            
+        status = {
+            'success': False,
+            'errors': errs
+        }
+        
+    return HttpResponse(json.dumps(status))
