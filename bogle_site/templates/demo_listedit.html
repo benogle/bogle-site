@@ -65,22 +65,27 @@
 	}
 
 
-	.editlink{
+	.edit-link{
 		float:right;
 		display:block;
 	}
 </style>
 
-<!--<script type="text/javascript" src="/smedia/js/jquery.form.js"></script>
+<script type="text/javascript" src="/smedia/js/jquery.form.js"></script>
 <script type="text/javascript" src="/smedia/js/jquery.hotkeys-0.7.9.js"></script>
 <script type="text/javascript" src="/smedia/js/jquery.inplaceform.js"></script>
-<script type="text/javascript" src="/smedia/js/jquery-ui-1.7.1.custom.min.js"></script>-->
+<script type="text/javascript" src="/smedia/js/jquery-ui-1.7.1.custom.min.js"></script>
 {% endblock %}
 
 {% block script %}
 
 $(document).ready(function(){
-
+	var editor = $('#myform').inplaceListEditor('#mylist', {
+		errorSelectors: {
+			subject:'.subjectError',
+			message:'.messageError'
+		}
+	});
 });
 
 {% endblock %}
@@ -111,8 +116,7 @@ $(document).ready(function(){
 
 
 <pre class="prettyprint">
-var adder = $('#myform').inplaceListAdder('#mylist', {
-	mode: 'insert',
+var editor = $('#myform').inplaceListEditor('#mylist', {
 	errorSelectors: {
 		subject:'.subjectError',
 		message:'.messageError'
@@ -128,12 +132,12 @@ var adder = $('#myform').inplaceListAdder('#mylist', {
 
 			<div class="myitem">
 
-				<div class="displayData">
-					<h3><a class="editlink" href="#">edit</a> header</h3>
+				<div class="display-data">
+					<h3><a class="edit-link" href="#">edit</a> header</h3>
 					<p>This is an item0!!!.</p>
 				</div>
 
-				<div class="editData">
+				<div class="edit-data">
 					<div input="id">0</div>
 					<div input="subject">header</div>
 					<div input="message">This is an item0!!!</div>
@@ -143,12 +147,12 @@ var adder = $('#myform').inplaceListAdder('#mylist', {
 
 			<div class="myitem">
 
-				<div class="displayData">
-					<h3><a class="editlink" href="#">edit</a> header</h3>
+				<div class="display-data">
+					<h3><a class="edit-link" href="#">edit</a> header</h3>
 					<p>This is an item1!!!.</p>
 				</div>
 
-				<div class="editData">
+				<div class="edit-data">
 					<div input="id">1</div>
 					<div input="subject">header</div>
 					<div input="message">This is an item1!!!</div>
@@ -158,12 +162,12 @@ var adder = $('#myform').inplaceListAdder('#mylist', {
 
 			<div class="myitem">
 
-				<div class="displayData">
-					<h3><a class="editlink" href="#">edit</a> header</h3>
+				<div class="display-data">
+					<h3><a class="edit-link" href="#">edit</a> header</h3>
 					<p>This is an item2!!!.</p>
 				</div>
 
-				<div class="editData">
+				<div class="edit-data">
 					<div input="id">2</div>
 					<div input="subject">header</div>
 					<div input="message">This is an item2!!!</div>
@@ -179,7 +183,7 @@ var adder = $('#myform').inplaceListAdder('#mylist', {
 			<div class="messageError error"></div>
 			<div>{{ form.message }}</div>
 			<div>
-				<input type="hidden" name="id" value="{{ form.id }}" />
+				{{ form.id }}
 				<input type="submit"/> <span class="loading"></span>
 				<a href="#" class="cancel" >cancel</a>
 			</div>

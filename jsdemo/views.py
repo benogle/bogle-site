@@ -4,6 +4,7 @@ from django.utils import simplejson as json
 from django import forms
 
 class ListAddForm(forms.Form):
+    id = forms.IntegerField(widget=forms.widgets.HiddenInput())
     subject = forms.CharField(max_length=100)
     message = forms.CharField(widget=forms.widgets.Textarea())
     
@@ -46,10 +47,24 @@ def listedit_edit(req):
     if form.is_valid():
         subject = form.cleaned_data['subject']
         message = form.cleaned_data['message']
-        
+        id = form.cleaned_data['id']
+    
         status = { 
             'success': True, 
-            'item': '<div class="myitem"><h3>%s</h3><p>%s</p></div>' % (subject, message)
+            'item': '''<div class="myitem">
+
+				<div class="display-data">
+					<h3><a class="edit-link" href="#">edit</a> %s</h3>
+					<p>%s</p>
+				</div>
+
+				<div class="edit-data">
+					<div input="id">%s</div>
+					<div input="subject">%s</div>
+					<div input="message">%s</div>
+				</div>
+
+			</div>''' % (subject, message, id, subject, message)
         }
         
         
