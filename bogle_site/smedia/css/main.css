@@ -201,10 +201,15 @@ div.entry p {
     text-justify: newspaper;
 }
 
-div.entry ul li {
+div.entry ul li, div.entry ol li {
 	color: #111;
 	text-align: justify; 
     text-justify: newspaper;
+	margin: 15px 0;
+}
+
+div.entry p, div.entry ul, div.entry ol{
+	line-height: 21px;
 }
 
 .entry-mo-24, .entry-mo-32, .entry-day, .entry-year {
@@ -288,10 +293,6 @@ pre.prettyprint, pre.command {
 	background: #91ceff;
 }
 
-.entry ul li{
-	margin: 15px 0;
-}
-
 .meta-sep{
     font-size: 1.2em;
     line-height: 1em;
@@ -346,45 +347,6 @@ pre.prettyprint, pre.command {
 /*********ENTRY END ***********/
 
 
-/*********** SIDEBAR ***********/
-
-div#sidebar {
-    float: right;
-    
-    padding-top: 17px;
-    *padding-top: 30px;
-    width:155px;
-}
-
-#sidebar ul {
-    padding: 0;
-    margin-left: 0;
-}
-
-#sidebar .sidebar-list {
-
-}
-
-#sidebar .sidebar-list li {
-    list-style:none;
-    margin-left: 0;
-}
-
-#sidebar .sidebar-list li h3 {
-    font-family: "Arial Black", Arial;
-    font-size: 15pt;
-    font-weight: bold;
-    margin-bottom: 0px;
-    margin-top: 5px;
-}
-
-#sidebar .sidebar-list li h3 a {
-    color: #282828;
-}
-
-#sidebar .sidebar-list li h3 a:hover {
-    color: #000;
-}
 
 
 
