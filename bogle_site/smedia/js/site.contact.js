@@ -31,7 +31,7 @@ $(document).ready(function(){
 			element.parent().addClass('field-error');
 			var u = $('<ul class="errorlist"></ul>');
 			var l = $('<li></li>');
-			u.append(l.append(error)).prependTo( element.parent());
+			u.append(l.append(error)).appendTo( element.parent());
 		},
 
 		submitHandler: function(form) {

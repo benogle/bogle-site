@@ -40,6 +40,16 @@ def listadd_add(req):
 def listedit_index(req):
     return render_to_response('demo_listedit.html', {'form':ListAddForm()})
     
+def listedit_data(req):
+    '''
+    yeah, this is stupid.
+    '''
+    data = {
+        'id': req.GET['id'],
+        'subject': req.GET['subject'],
+        'message': req.GET['message']
+    }
+    return HttpResponse(json.dumps(data))
     
 def listedit_edit(req):
     form = ListAddForm(req.POST)
@@ -54,8 +64,8 @@ def listedit_edit(req):
             'item': '''<div class="myitem">
 
 				<div class="display-data">
-					<h3><a class="edit-link" href="#">edit</a> %s</h3>
-					<p>%s</p>
+					<h3><a class="edit-link" href="#">edit</a> <span class="head-data">%s</span></h3>
+					<p><span class="body-data">%s</span></p>
 				</div>
 
 				<div class="edit-data">

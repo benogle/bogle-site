@@ -7,4 +7,5 @@ urlpatterns = patterns('',
     
     (r'^demo/listedit$', 'jsdemo.views.listedit_index'),
     (r'^demo/listedit/edit$', 'jsdemo.views.listedit_edit'),
+    (r'^demo/listedit/data$', 'jsdemo.views.listedit_data'),
 )

@@ -18,7 +18,7 @@
 <style>
 	.myitem{
 		padding: 0 10px;
-		margin: 1px 0;
+		margin: 10px 0;
 		border: 1px dashed #ddd;
 	}
 
@@ -84,6 +84,30 @@ $(document).ready(function(){
 		errorSelectors: {
 			subject:'.subjectError',
 			message:'.messageError'
+		}
+	});
+	
+	var editorAjax = $('#myform-ajax').inplaceListEditor('#mylist-ajax', {
+		errorSelectors: {
+			subject:'.subjectError',
+			message:'.messageError'
+		},
+		edit: function(item){
+			var id = item.find('.edit-data div[input="id"]').text();
+			var subj = item.find('.edit-data div[input="subject"]').text();
+			var msg = item.find('.edit-data div[input="message"]').text();
+			
+			function callback(data){
+				editorAjax.displayEditForm(data, item);
+			}
+			
+			$.get('/demo/listedit/data', {
+				id: id,
+				subject: subj,
+				message: msg
+			}, callback, 'json');
+			
+			return false;
 		}
 	});
 });
@@ -189,6 +213,73 @@ var editor = $('#myform').inplaceListEditor('#mylist', {
 			</div>
 		</form>
 	</div>
+	
+	<!-- ajax edit -->
+	<h3>AJAX Demo</h3>
+	
+	<div id="mylist-ajax">
+
+			<div class="myitem">
+
+				<div class="display-data">
+					<h3><a class="edit-link" href="#">edit</a> <span="head-data">header</span></h3>
+					<p><span="body-data">This is an item0!!!.</span></p>
+				</div>
+				
+				<div class="edit-data">
+					<div input="id">0</div>
+					<div input="subject">header</div>
+					<div input="message">This is an item1!!!</div>
+				</div>
+
+			</div>
+
+			<div class="myitem">
+
+				<div class="display-data">
+					<h3><a class="edit-link" href="#">edit</a> <span="head-data">header</span></h3>
+					<p><span="body-data">This is an item1!!!.</span></p>
+				</div>
+
+				<div class="edit-data">
+					<div input="id">1</div>
+					<div input="subject">header</div>
+					<div input="message">This is an item1!!!</div>
+				</div>
+
+			</div>
+
+			<div class="myitem">
+
+				<div class="display-data">
+					<h3><a class="edit-link" href="#">edit</a> <span="head-data">header</span></h3>
+					<p><span="body-data">This is an item2!!!.</span></p>
+				</div>
+
+				<div class="edit-data">
+					<div input="id">2</div>
+					<div input="subject">header</div>
+					<div input="message">This is an item2!!!</div>
+				</div>
+
+			</div>
+
+		</div>
+
+		<form id="myform-ajax" action="/demo/listedit/edit" method="POST">
+			<div class="subjectError error"></div>
+			<div>{{ form.subject }}</div>
+			<div class="messageError error"></div>
+			<div>{{ form.message }}</div>
+			<div>
+				{{ form.id }}
+				<input type="submit"/> <span class="loading"></span>
+				<a href="#" class="cancel" >cancel</a>
+			</div>
+		</form>
+	</div>
+		
+		<!-- end ajax edit -->
 </div>
 
 {% endblock %}

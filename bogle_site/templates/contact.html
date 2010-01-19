@@ -16,22 +16,82 @@
 <script type="text/javascript" src="/smedia/js/site.contact.js"></script>
 {% endblock %}
 
+{% block headblock %}
+<style type="text/css">
+/** contact form **/
+
+#contactform{
+
+}
+
+#contactform .field-wrapper{
+	margin: 5px 0;
+	padding: 5px 0;
+}
+
+#contactform .field-wrapper label.field-label{
+	margin-right: 10px;
+	padding-top: 2px;
+	display: block;
+	font-weight: bold;
+}
+
+#contactform .field-error{
+	/*padding: 10px 5px;*/
+}
+
+#contactform .field-error ul.errorlist{
+	margin: 0 0 0 0px;
+	padding: 0;
+	list-style:none;
+}
+
+#contactform .field-error ul.errorlist li{
+	list-style:none;
+	margin: 0;
+	padding: 0;
+	color: #c00;
+	font-weight: bold;
+}
+
+#contactform .field-wrapper input {
+	width: 400px;
+	border: 1px solid #ccc;
+}
+
+#contactform .field-wrapper input, #contactform .field-wrapper textarea {
+	width: 450px;
+	border: 1px solid #ccc;
+	padding: 6px;
+	font-size: 10pt;
+}
+#contactform .field-wrapper textarea{width: 500px;}
+
+#contactform .field-wrapper input.button {
+	width: auto;
+}
+</style>
+{% endblock %}
 
 {% block content %}
 
 <div class="entry-page">
-	<div class="entry-image">
-		<img src="{{ page.accent_image.geturl }}" alt="fluff image"/>
+	<h2 class="entry-title">
+		{% if status %}
+			Thank You
+		{% else %}
+			{{ page.title }}
+		{% endif %}
+	</h2>
+
+	<div class="entry-left">
+		<div class="entry-image">
+			<img src="{{ page.accent_image.geturl }}" alt="fluff image"/>
+		</div>
 	</div>
 
 	<div class="entry">
-		<h2 class="entry-title">
-			{% if status %}
-				Thank You
-			{% else %}
-				{{ page.title }}
-			{% endif %}
-		</h2>
+		
 		<div class="entry-content">
 
 			{% if status %}
@@ -46,19 +106,19 @@
 				<form id="contact" action="/contact" method="POST">
 					<div id="contactform">
 						<div class="field-wrapper {% if form.sender.errors %}field-error{% endif %}"  >
-							{{ form.sender.errors }}
 							<label class="field-label" for="id_sender">your email</label>
 							{{ form.sender }}
+							{{ form.sender.errors }}
 						</div>
 						<div class="field-wrapper {% if form.subject.errors %}field-error{% endif %}">
-							{{ form.subject.errors }}
 							<label class="field-label" for="id_subject">subject</label>
 							{{ form.subject }}
+							{{ form.subject.errors }}
 						</div>
 						<div class="field-wrapper {% if form.message.errors %}field-error{% endif %}">
-							{{ form.message.errors }}
 							<label class="field-label" for="id_message">message</label>
 							{{ form.message }}
+							{{ form.message.errors }}
 						</div>
 						<div class="field-wrapper">
 							<label class="field-label" ></label>
