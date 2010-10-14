@@ -1,0 +1,497 @@
+{% extends "quaid_base.html" %}
+
+{% block title %}Quaid{% endblock %}
+
+{% block description %}{% endblock %}
+
+{% block keywords %}{% endblock %}
+
+{% block sidebar %}
+
+{% endblock %}
+
+{% block scriptfiles %}
+{{block.super}}
+<style>
+    
+</style>
+{% endblock %}
+
+{% block script %}
+{{block.super}}
+$(document).ready(function(){
+    //example 1
+    var Animal = Class.extend({
+        init: function(numLegs){
+            this.numLegs = numLegs;
+        },
+        sound: function(){
+            return null;
+        }
+    });
+    
+    var Cat = Animal.extend({
+        init: function(){
+            this._super(4);
+        },
+        sound: function(){
+            return 'meow';
+        }
+    });
+    
+    $('#example1').click(function(){
+        var mycat = new Cat();
+        alert(mycat.sound());
+        return false;
+    });
+    
+    //toggler 1
+    Q.Toggler = Class.extend('Toggler', {
+        init: function(container, settings){
+            var defaults = {
+                trigger: null, // give me a string, jQuery object or function
+                isOpen: true   // open by default?
+            };
+            
+            this._super(container, $.extend({}, defaults, settings));
+            
+            var s = this.settings;
+            this._trigger = $.isFunction(s.trigger) ? s.trigger.call(this, container, s) : $(s.trigger);
+            
+            this._setup();
+        },
+        
+        _setup: function(){
+            var self = this;
+            this._trigger.click(function(){
+                self.toggle();
+                return false;
+            });
+            
+            this.settings.isOpen ? this.open() : this.close();
+        },
+        
+        close: function(){
+            this.container.hide();
+        },
+        
+        open: function(){
+            this.container.show();
+        },
+        
+        toggle: function(){
+            if(this.container.css('display') == 'none')
+                this.open();
+            else
+                this.close();
+        }
+    });
+    var mytoggler = $('#toggled1').Toggler({trigger: '#trigger1'});
+    
+    $.log(Q);
+    $.log('mytoggler cached object:', $('#toggled1').data('Toggler'));
+    
+    Q.Toggler.extend('FancyToggler', {
+        init: function(container, settings){
+            this._super(container, settings);
+        },
+        
+        close: function(){
+            var self = this;
+            self._height = self.container.height();
+            self.container.animate({height: 0}, 300, function(){
+                self.container.hide();
+            });
+        },
+        
+        open: function(){
+            var self = this;
+            self.container.animate({height: self._height}, 300, function(){
+                self.container.show();
+            });
+        }
+    });
+    var ftoggler = $('#ftoggled').FancyToggler({trigger: '#ftrigger'});
+    
+    
+    $('#open1, #toggle1, #close1').click(function(){
+        var id = this.id;
+        mytoggler[id.substring(0, id.length-1)]();
+        return false;
+    });
+    
+    var mytogglers = $('.toggled2').Toggler({
+        trigger: function(container, settings){
+            return container.parent().find('.trigger2');
+        },
+        isOpen: false
+    });
+    $.log('My Togglers:', mytogglers);
+});
+
+{% endblock %}
+
+{% block entrytitle %}Quaid Core module{% endblock %}
+
+{% block entrycontent %}
+
+<p>At Quaid's core is a modified implementation of
+<a href="http://ejohn.org/blog/simple-javascript-inheritance/">John Resig's
+'Simple JavaScript Inheritance'</a>. With it, you can create classes and objects like so:
+</p>
+
+<pre class="prettyprint">
+var Animal = Class.extend({
+    init: function(numLegs){
+        this.numLegs = numLegs;
+    },
+    sound: function(){
+        return null;
+    }
+});
+
+var Cat = Animal.extend({
+    init: function(){
+        this._super(4);
+    },
+    sound: function(){
+        return 'meow';
+    }
+});
+
+var mycat = new Cat();
+alert(mycat.sound());
+</pre>
+<p>This functionality is unchanged in Quaid: <a id="example1" href="#">what sound does a cat make?</a></p>
+<p>Quaid adds the ability to seamlessly turn these new classes into jQuery plugins.
+This lets you build really modular stateful plugins that are easy to maintain.</p>
+
+</h2>We'll start building a toggler plugin for
+demonstration purposes. This plugin will toggle a chunk of markup when some trigger is clicked.
+Hopefully this process will touch on everything you can do with the Core module. </p>
+
+<h2>Basics</h2>
+
+<p>To start, all we have to do is add a plugin name string before the object in
+Class.extend, and accept two parameters in the constructor (the init() function):
+<code>container</code> and <code>settings</code>.</p>
+
+<pre class="prettyprint">
+Class.extend('Toggler', {
+    init: function(container, settings){
+        this._super(container, settings);
+    }
+});
+</pre>
+
+<p>Now we can instantiate our new plugin like any normal plugin.
+First, some markup:</p>
+
+<pre class="prettyprint">
+&lt;a href="#" id="trigger"&gt;Toggle my subordinate!&lt;/a&gt;
+&lt;p id="toggled"&gt;Lorem ipsum ....&lt;/p&gt;
+</pre>
+
+<p>And some js:</p>
+
+<pre class="prettyprint">
+var mytoggler = $('#toggled').Toggler({ /* settings go here */ });
+</pre>
+
+<p>When this line is called, the Toggler.init() function we defined earlier is passed
+<code>$('#toggled')</code> in the <code>container</code> parameter, and
+<code>{ /* settings go here */ }</code> into the <code>settings</code> parameter.</p>
+
+<p>The return value of this call, <code>mytoggler</code>, is an object of type <code>Toggler</code> that extends
+type <code>Class</code>. This is different than a what you would usually expect a jQuery
+plugin to return. <code>mytoggler</code> will <b>not</b> be a jQuery object. You cannot chain
+it with other jQuery plugins. This is important and intentional. I will get into <a href="#why-meaningful-objects">why later</a>.</p>
+
+<p><code>mytoggler</code>, even with our simple implementation, will have some properties on it you can inspect.</p>
+
+<pre class="prettyprint">
+mytoggler.container // will be the $('#toggled') jQuery object
+mytoggler.settings  // will be the settings object you passed in
+</pre>
+
+<p>Also, Quaid caches the object it creates with jQuery.data(). So if we were to call
+<code>$('#toggled').Toggler()</code> again, the object would be equal to <code>mytoggler</code>.
+You can get this cached object by calling</p>
+
+<pre class="prettyprint">var cachedtoggler = $('#toggled').data('Toggler');
+//This will be the exact same object as mytoggler!</pre>
+
+<p>Quaid adds a new variable to the global scope: <code>Q</code>. All Quaid plugins hang
+off of this namespace. Whenever you create a plugin, it will be added to <code>Q</code>. Our new
+Toggler is accessable via <code>Q.Toggler</code>. You can instantiate your new plugin
+manually if you'd like. You will not get the caching functionality, though. To do so</p>
+
+<pre class="prettyprint">var mytoggler = new Q.Toggler($('#toggled'), { /* settings */ });</pre>
+
+<h2>Useful Example</h2>
+
+<p>Let's make our toggle do something useful: toggle markup.</p>
+
+<div id="example1" class="example">
+    <h4>Simple Toggler!</h4>
+    <p><a href="#" id="trigger1">Toggle my subordinate!</a></p>
+    <p id="toggled1">Lorem ipsum ....</p>
+</div>
+
+<pre class="prettyprint">Class.extend('Toggler', {
+    init: function(container, settings){
+        var defaults = {
+            trigger: null, // give me a string, jQuery object or function
+            isOpen: true   // open by default?
+        };
+        
+        this._super(container, $.extend({}, defaults, settings));
+        
+        var s = this.settings;
+        if($.isFunction(s.trigger)
+            this._trigger = s.trigger.call(this, container, s);
+        else
+            this._trigger = $(s.trigger);
+        
+        this._setup();
+    },
+    
+    _setup: function(){
+        var self = this;
+        this._trigger.click(function(){
+            self.toggle();
+            return false;
+        });
+        
+        this.settings.isOpen ? this.open() : this.close();
+    },
+    
+    close: function(){
+        this.container.hide();
+    },
+    open: function(){
+        this.container.show();
+    },
+    toggle: function(){
+        if(this.container.css('display') == 'none')
+            this.open();
+        else
+            this.close();
+    }
+});
+
+var mytoggler = $('#toggled').Toggler({trigger: '#trigger'});</pre>
+
+<p>Now <code>mytoggler</code> has a couple functions hanging off of it you can access:
+<code><a href="#" id="open1">mytoggler.open()</a></code>,
+<code><a href="#" id="close1">mytoggler.close()</a></code>,
+<code><a href="#" id="toggle1">mytoggler.toggle()</a></code>. 
+<code>mytoggler._setup()</code>, is callable if you want, but you're encouraged not to call it
+from outside. I usually prefix my 'private' functions with _. This is just convention. Quaid
+does not support the concept of actual private functions. :)
+</p>
+
+<h2>Static Members</h2>
+
+<p>Quaid has provision for declaring static members of the class inline with the rest of
+the class definition. This is useful for defaults. Defining defaults as accessable outside
+of the class definition is great as another part of the application can set the plugin's defaults.
+All Quaid's builtin plugins define their defaults this way.</p>
+
+<pre class="prettyprint">Class.extend('Toggler',{
+        // Static member declaration!
+        defaults: {
+            trigger: null, // give me a string, jQuery object or function
+            isOpen: true   // open by default?
+        }
+    },{
+    
+    init: function(container, settings){
+        //use the defaults
+        settings = $.extend({}, this._class.defaults, settings)
+        this._super(container, settings);
+        //...
+    }
+});
+
+Q.Toggler.defaults;</pre>
+
+<p>There are a couple new things to note here. First of all, we define the static members as a
+new object before the class' prototype functions.</p>
+
+<p>Second, there is <code>this._class</code>. <code>this._class</code> evaluates to the class
+definition where <code>this._class</code> is used. It is equivalent to <code>Q.Toggler</code>.</p>
+
+<p>This is exactly the same as </p>
+
+<pre class="prettyprint">Class.extend('Toggler',{
+    init: function(container, settings){
+        //use the defaults
+        settings = $.extend({}, this._class.defaults, settings)
+        this._super(container, settings);
+        //...
+    }
+});
+
+Q.Toggler.defaults = {
+    trigger: null, // give me a string, jQuery object or function
+    isOpen: true   // open by default?
+};</pre>
+
+<p>Use whichever you find cleanest.</p>
+
+<h2>Quaid Plugins on jQuery Object With Mutiple Elements</h2>
+
+<p>What happens when you call a Quaid plugin on a jQuery object wrapping muliple elements?
+It will return an array of your objects.</p>
+
+<div id="example2" class="example">
+    <h4>Many Togglers</h4>
+    <div><p><a href="#" class="trigger2">Toggle 1</a></p>
+    <p class="toggled2">Lorem ipsum ....</p></div>
+    
+    <div><p><a href="#" class="trigger2">Toggle 2</a></p>
+    <p class="toggled2">Lorem ipsum ....</p></div>
+    
+    <div><p><a href="#" class="trigger2">Toggle 3</a></p>
+    <p class="toggled2">Lorem ipsum ....</p></div>
+    
+    <div><p><a href="#" class="trigger2">Toggle 4</a></p>
+    <p class="toggled2">Lorem ipsum ....</p></div>
+</div>
+
+<pre class="prettyprint">&lt;div&gt;&lt;p&gt;&lt;a href="#" class="trigger2"&gt;Toggle 1&lt;/a&gt;&lt;/p&gt;
+&lt;p class="toggled2"&gt;Lorem ipsum ....&lt;/p&gt;&lt;/div&gt;
+
+&lt;div&gt;&lt;p&gt;&lt;a href="#" class="trigger2"&gt;Toggle 2&lt;/a&gt;&lt;/p&gt;
+&lt;p class="toggled2"&gt;Lorem ipsum ....&lt;/p&gt;&lt;/div&gt;
+
+&lt;div&gt;&lt;p&gt;&lt;a href="#" class="trigger2"&gt;Toggle 3&lt;/a&gt;&lt;/p&gt;
+&lt;p class="toggled2"&gt;Lorem ipsum ....&lt;/p&gt;&lt;/div&gt;
+
+&lt;div&gt;&lt;p&gt;&lt;a href="#" class="trigger2"&gt;Toggle 4&lt;/a&gt;&lt;/p&gt;
+&lt;p class="toggled2"&gt;Lorem ipsum ....&lt;/p&gt;&lt;/div&gt;
+    
+var mytogglers = $('.toggled2').Toggler({
+    trigger: function(container, settings){
+        return container.parent().find('.trigger2');
+    },
+    isOpen: false
+});
+
+// Will return array of 4 Toggler objects.
+// Check out your console to see!
+$.log('My Togglers:', mytogglers); </pre>
+    
+<h2>Inheritance</h2>
+
+<p>Now we have and awesome Toggler class. But it doesn't animate! We need it to be much
+fancier. So we create a new plugin that overrides the open and close functions.</p>
+
+<div id="example3" class="example">
+    <h4>Fancy Toggler</h4>
+    <div><p><a href="#" id="ftrigger">Ooooooh Aaaaaaah</a></p>
+    <p id="ftoggled">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse mattis facilisis lorem, ut auctor turpis blandit ac. Mauris sodales euismod lacinia. Morbi iaculis mattis dictum. Praesent orci felis, pretium sed lobortis at, mollis non sapien. Vivamus et magna at risus bibendum semper. Vivamus dignissim dui non enim consectetur quis malesuada augue blandit. Morbi eget purus vitae sapien vestibulum pharetra. Curabitur sit amet nibh condimentum justo varius feugiat. Nullam tempus eros quis est vulputate mattis. Curabitur luctus velit porta enim eleifend volutpat. Integer rutrum turpis erat, sed facilisis quam. Fusce accumsan facilisis magna, at posuere leo dictum id. Sed tincidunt leo a dolor vulputate interdum. Fusce tincidunt mauris orci. Nullam nisi purus, venenatis id volutpat eu, accumsan non orci. Morbi vel aliquet sapien. Donec mollis vehicula tellus eget placerat. Vivamus placerat cursus augue, vel condimentum enim pretium sit amet. Donec sit amet nulla turpis, id tincidunt diam. </p></div>
+</div>
+
+<pre class="prettyprint">Q.Toggler.extend('FancyToggler', {
+    init: function(container, settings){
+        this._super(container, settings);
+    },
+    
+    close: function(){
+        var self = this;
+        self._height = self.container.height();
+        self.container.animate({height: 0}, 300, function(){
+            self.container.hide();
+        });
+    },
+    
+    open: function(){
+        var self = this;
+        self.container.animate({height: self._height}, 300, function(){
+            self.container.show();
+        });
+    }
+});
+var ftoggler = $('#ftoggled').FancyToggler({trigger: '#ftrigger'});</pre>
+
+<h2 id="why-meaningful-objects">Why Doesn't Quaid Return jQuery Objects?</h2>
+
+<p>Now for a little philosophy. Quaid plugins do not return jQuery objects.
+They return objects with attributes as you define them in your class/plugin. How come?</p>
+
+<p>When I am writing front-end code for a complex project, I want to abstract chunks of HTML.
+I want to take a bit of markup and give it a meaningful api. By returning a jQuery object
+I am getting back a whole bunch of functions and attributes that have nothing to do with my chunk of
+markup. Let's extend our toggler example. What if Quaid returned a jQuery object? The return
+object for instantiation of the Toggler plugin would be the original element with no context.
+If I had jQuery UI installed, the resulting object would have a dialog() function! What?! My little
+paragraph to toggle is not a dialog. It does not want to be a dialog.</p>
+
+<p>What if I return a jQuery object from my plugin and I want an outside object to invoke some
+function on my plugin? I have a couple
+options as a plugin writer to expose those functions. I can pollute the jQuery namespace
+further with extra functions to do my dirty work.
+</p>
+
+<pre class="prettyprint">
+// Many plugins use this method. :(
+var togjq = $('#meow').Toggler({ /* settings */ });
+// togjq is a jQuery object
+togjq.TogglerOpen();
+togjq.TogglerClose();
+togjq.TogglerToggle();
+</pre>
+
+<p>Slop. We shouldn't be polluting the space with functions that will be confused when we call
+them on an element that doesn't know what a Toggler is. Bad bad.</p>
+
+<p>A second option is to have my initial plugin instantiation call handle function calls as well as
+instantiation. jQuery UI uses this method</p>
+
+<pre class="prettyprint">
+var togjq = $('#meow').Toggler({ /* settings */ });
+// togjq is a jQuery object
+togjq.Toggler('open');
+togjq.Toggler('close');
+togjq.Toggler('toggle');
+</pre>
+
+<p>As a consumer of this API, I am frustrated. It feels sloppy. Does the element I am calling
+this on already have an underlying Toggler object? In this case it is obvious, but in my
+experience with jQuery UI, it is not. This API does not give me full access
+to the underlying object. I cannot inspect attributes of the object, I cannot call private
+methods, and I cannot override anything to extend functionality. I was sufficiently frustrated
+with jQuery UI's chioce with this API, that I wrote a special Quaid Class.extend function
+to wrap jqUI objects. All of the dialogs on <a href="http://adroll.com">AdRoll</a> are
+Q.AdrollDialogs which extend ui.dialog. I also wrote a few special dialogs extending
+Q.AdrollDialogs like MediaDialog to handle the display of images and flash objects (flash
+creative, videos, etc.).</p>
+
+<p>A third way to expose these functions would just be to put an object in the element's
+jQuery.data store.</p>
+
+<pre class="prettyprint">
+var togjq = $('#meow').Toggler({ /* settings */ });
+var realObj = togjq.data('Toggler');
+realObj.open();
+realObj.close();
+realObj.toggle();
+</pre>
+
+<p>This feels like an extra step. Boo.</p>
+
+<p>I'm sure a concern with Quaid's choice is that of chainability. I confess that I really never
+use the chainability feature. I have been using Quaid in various incarnations for
+over a year and I have never once thougt it needed to be able to be chained together. In one
+of the earlier Quaid implementations, I wrote a few plugins that returned jQuery objects. I
+found myself grabbing the cached version of the object every time I used those plugins. Something
+to the effect of
+
+<pre class="prettyprint">var realObj = $('#meow').Toggler({ /* settings */ }).data('Toggler');</pre>
+
+<p>Quaid's core is all about encapsulation. I found that if I properly wrapped up my
+chunk of markup into a semantically meaningful plugin, I didn't need to chain.</p>
+
+{% endblock %}

@@ -1,0 +1,131 @@
+{% extends "quaid_base.html" %}
+
+{% block title %}Quaid{% endblock %}
+
+{% block description %}{% endblock %}
+
+{% block keywords %}{% endblock %}
+
+{% block sidebar %}
+
+{% endblock %}
+
+{% block scriptfiles %}
+{{block.super}}
+<style>
+    
+</style>
+{% endblock %}
+
+{% block script %}
+{{block.super}}
+
+$(document).ready(function(){
+
+    for( var i = 0; i < $.log.LEVEL_ORDER.length; i++)
+        $('#log-level').append($('<option/>', {value: i, text: $.log.LEVEL_FUNCTIONS[$.log.LEVEL_ORDER[i]]}));
+    
+    for( var i = 0; i < $.log.LEVEL_ORDER.length; i++)
+        $('#log-type').append($('<option/>', {
+            value: $.log.LEVEL_FUNCTIONS[$.log.LEVEL_ORDER[i]],
+            text: 'Type - ' + $.log.LEVEL_FUNCTIONS[$.log.LEVEL_ORDER[i]]
+        }));
+    
+    $('#example1 form').submit(function(){
+        var self = $(this);
+        var text = self.find('#custom-log').val();
+        $[self.find('#log-type').val()](text);
+        return false;
+    });
+    
+    $('#log-level').change(function(){
+        $.log.level = parseInt($(this).val());
+    });
+    
+    $('#log-enabled').click(function(){
+        $.log.enabled = $(this).is(':checked');
+    });
+    
+    $('.log-button').click(function(){
+        var fn = this.id.substring(4);
+        $[fn]($(this).val());
+    });
+});
+
+{% endblock %}
+
+{% block entrytitle %}Quaid Log module{% endblock %}
+{% block entrycontent %}
+
+<p>Quaid's log module provides you with a nice, cross browser logging interface.
+<code>console.log()</code> is awesome. But what if you don't have firebug enabled? Fail.
+What if you leave one in and your user has IE6? Fail. Did you know that safari and firebug
+have <code>console.error()</code> and <code>console.warn()</code> functions? Cool, right?
+What happens when these are run on IE? This module allows you to use logging functionality
+without worrying about these things.</p>
+
+<p>The log module adds 5 functions to the jQuery namespace</p>
+
+<pre class="prettyprint">
+$.debug(); //level 0
+$.info();  //level 1
+$.warn();  //level 2
+$.error(); //level 3
+$.log();   //level 4
+</pre>
+
+<p>And a couple of options</p>
+
+<pre class="prettyprint">
+$.log.enabled = true;
+$.log.level = 0;
+</pre>
+
+<p>Setting <code>$.log.enabled</code> to false will obviously not allow any log messages to
+make it to the console.</p>
+
+<p><code>$.log.level</code> allows you to adjust what kind of messages you see in the console.
+The log module will only display messages from log functions with a level greater than or equal
+to <code>$.log.level</code>. So by default, all messages show. Set <code>$.log.level</code>
+to 2 and only warn, error, and log messages will appear.</p>
+
+<div id="example1" class="example">
+    <h4>Log Tester</h4>
+    
+    <p>Play around with this to get a handle on how the logging works. Open up firebug, your
+    webkit console, or nothing, and it'll failover to firebug lite.</p>
+    
+    <form>
+        <p>
+            <input type="checkbox" id="log-enabled" checked="checked" class="checkbox"/>
+            <span>Logging Enabled</span>
+        </p>
+        <p>
+            <label>Log Level</label>
+            <select id="log-level">
+            </select>
+        </p>
+        <p>
+            <input type="text" id="custom-log" class="textbox"/>
+            <select id="log-type"></select>
+            <input type="submit" value="log it!" id="custom-button"/>
+        </p>
+        <p>
+            <input type="button" class="log-button" value="debug message" id="log-debug"/>
+            <input type="button" class="log-button" value="info message" id="log-info"/>
+            <input type="button" class="log-button" value="warn message" id="log-warn"/>
+            <input type="button" class="log-button" value="error message" id="log-error"/>
+            <input type="button" class="log-button" value="log message" id="log-log"/>
+        </p>
+    </form>
+</div>
+
+<pre class="prettyprint">
+
+</pre>
+
+<h2>Failover</h2>
+
+<h2>Advanced</h2>
+
+{% endblock %}

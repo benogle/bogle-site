@@ -1,0 +1,261 @@
+{% extends "quaid_base.html" %}
+
+{% block title %}Quaid{% endblock %}
+
+{% block description %}{% endblock %}
+
+{% block keywords %}{% endblock %}
+
+{% block sidebar %}
+
+{% endblock %}
+
+{% block scriptfiles %}
+{{block.super}}
+<style>
+    
+</style>
+{% endblock %}
+
+{% block script %}
+{{block.super}}
+
+$(document).ready(function(){
+    
+    Q.Loader.defaults.image = '/smedia/img/16x16_arrows.gif';
+    Q.Loader.defaults.location = {position: 'absolute', right: 5, top: 5};
+    // We create a plugin called UpdateForm that extends Quaid provided Q.AsyncForm
+	Q.AsyncForm.extend('UpdateForm', {
+        
+        // You can specify static members this way.
+        // For example, these defaults will be available via Q.UpdateForm.defaults
+        defaults: {
+            blockToUpdate: null,
+            dataFormats: {},
+            loaderLocation: {position: 'absolute', right: 5, top: 5}
+        }
+        
+    }, {
+        
+        // Our plugin's constructor
+        init: function(container, settings){
+            
+            // We call Q.AsyncForm's constructor passing it settings
+            // which may be overriden by the user.
+            this._super(container, $.extend({}, this._class.defaults, settings))
+            this._block = $(this.settings.blockToUpdate);
+        },
+        
+        // Override Q.AsyncForm's onSuccess function
+        onSuccess: function(data){
+        
+            // We loop through the results, format the data according to
+            // the formats specified in the settings, then we put the server's
+            // data into the markup.
+            for(var k in data.results){
+                
+                // Format the raw data from the server based on settigns
+                var formattedData = Q.DataFormatters.get(this.settings.dataFormats[k], data.results[k]);
+                
+                // Server's key matches some element's class name.
+                this._block.find('.'+k).text(formattedData);
+            }
+            
+            //call the user's callback
+            this._super.apply(this, arguments); 
+        }
+    });
+    
+    // Here we instantiate our new plugin! 
+    $('#example1').UpdateForm({
+        
+        // Where to put the data from the server
+        blockToUpdate: '#example1 .update-me',
+        
+        // Tells our plugin how to interpret the data coming back from the server
+        dataFormats: {
+            mileage: 'decimal(1)',
+            programmers: 'number'
+        },
+        
+        // Client validation options. 
+        validationOptions:{
+            rules:{
+                name: 'required',
+                miles: 'required',
+                programmers: 'required'
+            }
+        },
+        
+        onFail: function(){
+            this.container.find('.update-me').hide();
+        },
+        
+        // Our success callback
+        onSuccess: function(data){
+            this.container.find('.update-me').show();
+        }
+    });
+    
+});
+
+{% endblock %}
+
+{% block entrytitle %}Quaid{% endblock %}
+{% block entrycontent %}
+
+<p>Quaid is a javascript library on top of jQuery that helps you write cleaner, more-robust code.
+You can think of it as a little framework with which to easily build widgets and
+other stateful jQuery plugins, but I like to think it is a bit more than that. 
+I've found that with each new web app project I start, I come up against two pretty fundamental
+problems:</p>
+
+<ul>
+    <li>How do I organize my js into clean, logical, maintainable chunks?</li>
+    <li>How do I handle errors from async requests without cruft?</li>
+</ul>
+
+<p>Quaid grew out of a number of attempts to answer these questions. Along the way,
+I found myself writing the same basic code for a couple things:</p>
+
+<ul>
+    <li>Logging that has levels and can be enabled/disabled.</li>
+    <li>General async request utilities like avoiding race conditions, connecting the form plugin to
+    the validation plugin, handling loading images, etc.</li>
+    <li>Data formatters to convert data (numbers, dates, etc) from the server to human readable formats.</li>
+</ul>
+
+<p>So Quaid has those too. This may seem like a random collection of tools to be in one library,
+so let's see how it all fits together.</p>
+
+<p>Assume you have to build an ajaxey form. You want your real validation
+    to be done on the server, and maybe some superficial convenience stuff to be checked on the
+    client side. The user shouldn't see the client and server validation as any different,
+    and he needs feedback when the page is waiting for the server. When the form
+    validates, you want the data returned from the server to update some markup.
+    You have a lot of forms with these requirements. What do you do?</p>
+
+<div id="example1" class="example">
+    <h4>Example 1</h4>
+    
+    <p>Break the form below. The miles box only accepts floats, and the programmers
+    box only accepts ints. Bob, Jim, and Jack are not available as names.</p>
+    <form action="/quaid/example1" method="post">
+        <div class="chunk"><label>Your Name</label> <input type="text" name="name" class="textbox"/></div>
+        <div class="chunk"><label>How many miles is it from NYC to SF?</label> <input type="text" name="miles" class="textbox"/></div>
+        <div class="chunk"><label>How many programmers does it take to change a lightbulb?</label> <input type="text" name="programmers" class="textbox"/></div>
+        <div class="chunk"><input type="submit" value="Yo mamma says, 'submit!'" /></div>
+    </form>
+    <div class="update-me">
+        <p>Hi <span class="update name"></span>.</p>
+        <p>Mileage from NYC to SF? You guessed <span class="update mileage"></span>. <span class="update mileage_message"></span></p>
+        <p>And how many programmers to change a lightbulb? You guessed <span class="update programmers"></span>. <span class="update programmers_message"></span></p>
+    </div>
+</div>
+
+<p>Notice that the required validation check is done by the client, but all other
+validation is done on the server. The neat thing is that both validation issues from
+the server and the client run through the same mechanism in the
+<a href="http://bassistance.de/jquery-plugins/jquery-plugin-validation/">Bassistance validation plugin</a>.
+You probably want to see what Quaid looks like. Here:</p>
+
+<pre class="prettyprint">
+// We create a plugin called UpdateForm that extends Quaid provided Q.AsyncForm
+Q.AsyncForm.extend('UpdateForm', {
+    
+    // You can specify static members this way.
+    // For example, these defaults will be available via Q.UpdateForm.defaults
+    defaults: {
+        blockToUpdate: null,
+        dataFormats: {},
+        loaderLocation: {position: 'absolute', right: 5, top: 5}
+    }
+    
+}, {
+    
+    // Our plugin's constructor
+    init: function(container, settings){
+        
+        // We call Q.AsyncForm's constructor passing it settings
+        // which may be overriden by the user.
+        this._super(container, $.extend({}, this._class.defaults, settings))
+        this._block = $(this.settings.blockToUpdate);
+    },
+    
+    // Override Q.AsyncForm's onSuccess function
+    onSuccess: function(data){
+    
+        // We loop through the results, format the data according to
+        // the formats specified in the settings, then we put the server's
+        // data into the markup.
+        for(var k in data.results){
+            
+            // Format the raw data from the server based on settigns
+            var formattedData = Q.DataFormatters.get(this.settings.dataFormats[k], data.results[k]);
+            
+            // Server's key matches some element's class name.
+            this._block.find('.'+k).text(formattedData);
+        }
+        
+        //call the user's callback
+        this._super.apply(this, arguments); 
+    }
+});
+
+// Here we instantiate our new plugin! 
+$('#example1').UpdateForm({
+    
+    // Where to put the data from the server
+    blockToUpdate: '#example1 .update-me',
+    
+    // Tells our plugin how to interpret the data coming back from the server
+    dataFormats: {
+        mileage: 'decimal(1)',
+        programmers: 'number'
+    },
+    
+    // Client validation options. 
+    validationOptions:{
+        rules:{
+            name: 'required',
+            miles: 'required',
+            programmers: 'required'
+        }
+    },
+    
+    // Our success callback
+    onSuccess: function(data){
+        this.container.find('.update-me').show();
+    }
+});
+</pre>
+
+<h2>Quaid is broken down into six modules</h2>
+
+<h3><a href="/quaid/core">Core</a></h3>
+<p>The core implements the Class pattern and a mechanism for connecting your shiny newy classes
+to jQuery</p>
+
+<h3><a href="/quaid/log">Log</a></h3>
+<p>The log module is all about logging. It utilizes all the console.x() functions and has failovers
+when they aren't available. For example, it can failover to firebug lite, or an even lighter
+'SimpleConsole' that is included with Quaid.</p>
+
+<h3><a href="/quaid/widget">Widget</a></h3>
+<p>Right now the widget module implements the Loader classes which handle loading images for you.</p>
+
+<h3><a href="/quaid/form">Form</a></h3>
+<p>The form module provides classes to encapsulate forms. Form handling shouldn't be a pain. This
+module eases the burn.</p>
+
+<h3><a href="/quaid/util">Util</a></h3>
+<p>What library would be complete without a util module? This one provides data formatting
+capabilities and functions I felt were missing from jQuery.</p>
+
+<h3><a href="/quaid/validation">Validation</a></h3>
+<p>The validation module connects your async responses to the
+<a href="http://bassistance.de/jquery-plugins/jquery-plugin-validation/">Bassistance validation plugin</a>
+and provides some other handy async response features.
+</p>
+
+{% endblock %}

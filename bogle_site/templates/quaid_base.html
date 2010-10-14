@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}List Edit Demo{% endblock %}
+
+{% block description %}{% endblock %}
+
+{% block keywords %}{% endblock %}
+
+{% block head-img %}/smedia/img/headproj.png{% endblock %}
+
+{% block script %}
+$(document).ready(function(){
+   prettyPrint(); 
+});
+{% endblock %}
+
+{% block sidebar %}
+
+{% endblock %}
+
+{% block scriptfiles %}
+<style>
+    .example {padding: 10px; background: #f5f5f5; border: 1px solid #ddd; margin: 15px 0;}
+    .example h4 {margin: 0 0 20px 0; color: #aaa;}
+    .example form{margin: 0;}
+    .example form .chunk{margin: 5px 0;}
+    .example .update{font-weight: bold;}
+    .example label{display: block;}
+    label.error{color: #f00;}
+    .textbox {border: 1px solid #ccc; padding: 5px;}
+    
+    pre.prettyprint{-moz-border-radius: 4px;}
+    .update-me{display:none;}
+</style>
+
+<script type="text/javascript" src="/smedia/js/jquery.form.js"></script>
+<script type="text/javascript" src="/smedia/js/jquery.validate.js"></script>
+<script type="text/javascript" src="/smedia/js/quaid.js"></script>
+<link href="http://blog.benogle.com/wp-content/plugins/google_code_prettify/prettify.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="http://blog.benogle.com/wp-content/plugins/google_code_prettify/prettify.js"></script>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="entry-page">
+	
+    <h2 class="entry-title">{% block entrytitle %}{% endblock %}</h2>
+    
+    <div class="entry-left"><div class="entry-image"></div></div>
+    
+	<div class="entry">
+		<div class="entry-content">
+            {% block entrycontent %}{% endblock %}
+        </div>
+
+	</div>
+    
+</div>
+
+{% endblock %}
