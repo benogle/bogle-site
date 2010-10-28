@@ -1,0 +1,209 @@
+{% extends "quaid_base.html" %}
+
+{% block title %}Quaid{% endblock %}
+
+{% block description %}{% endblock %}
+
+{% block keywords %}{% endblock %}
+
+{% block sidebar %}
+
+{% endblock %}
+
+{% block scriptfiles %}
+{{block.super}}
+<style>
+    #example1 .results {display: none;}
+</style>
+{% endblock %}
+
+{% block script %}
+{{block.super}}
+
+Q.currentPage = 'util';
+$(document).ready(function(){
+    $('#example1').Form({
+        validationOptions: {
+            rules: {
+                data: 'required',
+                formatter: 'required'
+            }
+        },
+        onSubmit: function(form, data){
+            if(!form.valid()) return false;
+            
+            var res = this.form.find('.results');
+            
+            var found = false;
+            var formatter = Q.DataFormatters._parseInterpreter(data.formatter);
+            if(formatter.fn in Q.DataFormatters)
+                found = true;
+            
+            function parseBool(d){
+                if (d == 'true') return true;
+                if (d == 'false') return false;
+                return null;
+            }
+            
+            var parsefns = {
+                number: parseInt,
+                decimal: parseFloat,
+                percent: parseFloat,
+                dollar: parseFloat,
+                bool: parseBool
+            };
+            
+            for(var k in parsefns){
+                if(data.formatter.indexOf(k) >= 0){
+                    data.data = parsefns[k](data.data);
+                    break;
+                }
+            }
+            
+            res.find('.input').text(data.data);
+            res.find('.output').text(Q.DataFormatters.get(data.formatter, data.data));
+            res.find('.formatter').text(data.formatter + (found ? '' : ' (not found)'));
+            
+            res.show();
+            
+            return false;
+        }
+    });
+    
+    Q.DataFormatters.moo = function(data, times){
+        if(!times) times = 1;
+        var moos = [];
+        for(var i = 0; i < times; i++)
+            moos.push('moo');
+        return moos.join(' ');
+    };
+});
+
+{% endblock %}
+
+{% block entrytitle %}Quaid Util module{% endblock %}
+{% block entrycontent %}
+
+<p>Quaid's <code>Util</code> module adds a number of utility functions to the $ namespace
+and a couple utilities to the Q namespace.
+Each of those is explained in the API docs. The util module is also home to the
+<code>Q.DataFormatters</code>, which is what I will explain a bit here.</p>
+
+<p>Quaid's DataFormatters are a generic, extensible way to specify how to format data with 
+strings. For example, let's say we had a number 1.482389892 and we wanted it to be formatted
+as US dollars. With the DataFormatters, we can do this</p>
+
+<pre class="prettyprint">
+var num = 1.482389892;
+var formatted = Q.DataFormatters.get('dollar', num)
+//formatted will be '$1.48'
+</pre>
+
+<p>This is useful for telling a plugin how to format the data it gets from, say, an async
+response. Let's say we were building a DataTable plugin that displayed a table and made async
+requests back to the server when a user wanted to go to the next page. Ideally, the server
+would just return the data, and the The DataTable plugin would figure out how to display it
+to the user. This is where our DataFormatters come in handy. We can tell the plugin how to
+display the data for each column. Our fictional DataTable initializer and formatter usage might look
+something like this</p>
+
+<pre class="prettyprint">
+// The initializer
+$('#mytable table').DataTable({
+    columnFormatters:{
+        created_date: 'date',
+        number_items: 'number',
+        some_ratio: 'percent(2)',
+        user_spend: 'dollar'
+    }
+});
+
+// How DataTable might use the formatters
+Q.DataTable = Class.extend('DataTable',{
+    //...
+    _onAsyncCallSuccess(data){
+        var tableRows = data.tableRows;
+        // tableRows could be a list of dictionaries:
+        //   [{created_date: '03-10-2010', number_items: 23, ...},{...}]
+        
+        for(var i = 0; i < tableRows.length; i++){
+            var displayRow = {};
+            for(var k in tableRows[i]){
+                var toFormat = tableRows[i][k];
+                var format = this.settings.columnFormatters[k];
+                // Note that format might be undefined.
+                // Q.DataFormatters handles this by just returning
+                // the raw data
+                var formatted = Q.DataFormatters.get(format, toFormat);
+                displayRow[k] = formatted;
+            }
+        }
+    }
+    //...
+});
+</pre>
+
+<p>There are a number of formatters to choose from.</p>
+
+<pre class="prettyprint">
+number              : 12345 -> '12,345'
+decimal(decimals)   : 12341.2345 -> '12,341.23'
+percent(decimals)   : 2.342345 -> '2.34%'
+dollar              : 12345.2345 -> '$12,345.23'
+date                : '03-12-2010' -> 'Mar 12, 2010'
+datetime            : '3-23-10 19:45' -> 'Mar 23, 2010 19:45'
+bool                : true -> 'Yes'
+</pre>
+
+<div id="example1" class="example">
+    <h4>Q.DataFormatters Example</h4>
+    
+    <p>Type in data and your formatter of choice. For example: data: <code>12345.125</code>, formatter: <code>dollar</code>.</p>
+    
+    <form>
+        <div><label>data</label>
+        <input type="text" name="data"/></div>
+        <div><label>formatter</label>
+        <input type="text" name="formatter"/></div>
+        
+        <div><input type="submit" value="Submit"/></div>
+        
+        <div class="results">
+            Formatter: <b><span class="formatter">0</span></b> : input: <b><span class="input">0</span></b>; output <b><span class="output">0</span></b>
+        </div>
+    </form>
+    
+</div>
+
+<h2 id="extending-dataformatters">Extending Q.DataFormatters</h2>
+
+<p>You probably want to add your own types to the formatters. This is easy. When you call</p>
+
+<pre class="prettyprint">
+var formatted = Q.DataFormatters.get('decimal(3)', 1.482389892)
+</pre>
+
+<p><code>Q.DataFormatters.get</code> will look for a function called 'decimal' on
+<code>Q.DataFormatters</code> and pass that function the raw data, and 3 as an optional
+param. You can add your own type by defining a new function.</p>
+
+<pre class="prettyprint">
+// Function moo takes reasonable input (data) and makes
+// it a bunch of unintelligible 'moo's. You know, like a cow.
+Q.DataFormatters.moo = function(data, times){
+    if(!times) times = 1;
+    var moos = [];
+    for(var i = 0; i < times; i++)
+        moos.push('moo');
+    return moos.join(' ');
+};
+</pre>
+<p>Then you can use it like this</p>
+
+<pre class="prettyprint">
+var formatted = Q.DataFormatters.get('moo', 1.482389892)
+</pre>
+
+<p>Try the 'moo' formatter in the example box above. i.e. <code>moo(5)</code> or just <code>moo</code></p>
+
+{% endblock %}

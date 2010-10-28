@@ -1,0 +1,416 @@
+{% extends "quaid_base.html" %}
+
+{% block title %}Quaid{% endblock %}
+
+{% block description %}{% endblock %}
+
+{% block keywords %}{% endblock %}
+
+{% block sidebar %}
+
+{% endblock %}
+
+{% block scriptfiles %}
+{{block.super}}
+<style>
+</style>
+{% endblock %}
+
+{% block script %}
+{{block.super}}
+
+Q.currentPage = 'form';
+
+$(document).ready(function(){
+    Q.Loader.defaults.image = '/smedia/img/16x16_arrows.gif';
+    Q.Loader.defaults.location = {position: 'absolute', left: 5, top: 5};
+    
+    var form2 = $('#example2 .form-magic').Form({
+        resetInitially: true,
+        validationOptions: {
+            rules: {
+                name: 'required',
+                age: 'required',
+                height: 'required'
+            }
+        },
+        dataTypes: {
+            age: 'int',
+            height: 'decimal'
+        },
+        defaultData: {
+            age: 0,
+            height: '0.0',
+            like_trains: true,
+            am: 'home'
+        },
+        onSubmit: function(){
+            if(this.form.valid()) alert('You submitted!');
+            return false;
+        },
+        onLoad: function(data){
+            alert('Loading ' + data.name + '!')
+        }
+    });
+    
+    $('#example2 .actions a').click(function(){
+        var s = $(this);
+        var easyfns = {'reset':0, 'hide':0, 'show':0, 'submit':0};
+        var fn = s.attr('class');
+        
+        if(fn in easyfns)
+            form2[fn]();
+        else if(fn == 'get')
+            alert(form2.val('am'));
+        else if(fn == 'load')
+            form2.load({
+                name: 'Jim Reynolds',
+                age: '25',
+                height: '6.3',
+                like_chicken: true,
+                like_drinking: true,
+                am: 'summersaulting'
+            });
+        
+        return false;
+    });
+    
+    var forma = $('#example3 .form-magic').AsyncForm({
+        validationOptions: {
+            rules: {
+                name: 'required',
+            }
+        },
+        onSuccess: function(data){
+            $.info('Q.AsyncForm succeeded. onSuccess called with params: ', arguments)
+        },
+        onFail: function(errorType, errors){
+            $.info('Q.AsyncForm failed. onFail called with params: ', arguments)
+        }
+    });
+    
+});
+
+{% endblock %}
+
+{% block entrytitle %}Quaid Form module{% endblock %}
+{% block entrycontent %}
+
+<p>Quaid's <code>Form</code> module aids in (surprise!) form handling. It is all about
+giving a meaningful API to forms and form elements. The Form module defines a number of
+classes.</p>
+
+<pre class="prettyprint">
+Q.Textbox
+Q.IntBox
+Q.DecimalBox
+
+Q.Form
+Q.AsyncForm
+</pre>
+
+<h2 id="basics">Basics</h2>
+
+<p><code>Q.Form</code> is the central component. Calling it on a form of yours will give you
+an object that will hopefully ease the interaction with your form. Let's see what it looks like
+with a bunch of different input types. Code first, eh?</p>
+
+<pre class="prettyprint">
+var kickassform = $('.form-magic').Form();
+</pre>
+<pre class="prettyprint">
+&lt;div class="form-magic"&gt;
+    &lt;form&gt;
+        &lt;div&gt;&lt;label&gt;Name&lt;/label&gt;
+        &lt;input type="text" name="name"/&gt;&lt;/div&gt;
+        
+        &lt;div&gt;&lt;label&gt;Age&lt;/label&gt;
+        &lt;input type="text" name="age"/&gt;&lt;/div&gt;
+        
+        &lt;div&gt;&lt;label&gt;Height in Feet&lt;/label&gt;
+        &lt;input type="text" name="height"/&gt;&lt;/div&gt;
+        
+        &lt;div&gt;&lt;label&gt;I Like&lt;/label&gt;
+            &lt;div&gt;
+                &lt;input type="checkbox" name="like_trains"/&gt; Trains &lt;br/&gt;
+                &lt;input type="checkbox" name="like_lamp"/&gt; Lamp &lt;br/&gt;
+                &lt;input type="checkbox" name="like_drinking"/&gt; Drinking &lt;br/&gt;
+                &lt;input type="checkbox" name="like_chicken"/&gt; Chicken strips with BBQ sauce
+            &lt;/div&gt;
+        &lt;/div&gt;
+        
+        &lt;div&gt;&lt;label&gt;I Am&lt;/label&gt;
+        &lt;div&gt;
+            &lt;input type="radio" name="am" value="home"/&gt; At home &lt;br/&gt;
+            &lt;input type="radio" name="am" value="boat"/&gt; On a boat &lt;br/&gt;
+            &lt;input type="radio" name="am" value="summersault"/&gt; Doing summersaults  &lt;br/&gt;
+            &lt;input type="radio" name="am" value="chicken"/&gt; Eating Chicken strips with martha fookin BBQ sauce
+        &lt;/div&gt;&lt;/div&gt;
+        
+        &lt;div&gt;&lt;input type="submit" value="Submit"/&gt;&lt;/div&gt;
+    &lt;/form&gt;
+&lt;/div&gt;
+</pre>
+
+<p>Note that I can call <code>.Form()</code> on any parent of the form if you'd like.
+The plugin will find the child form. <code>kickassform</code> will have a number of public methods:</p>
+
+<pre class="prettyprint">
+//get or sets an element's value
+kickassform.val(name, val);
+
+//will load the data of your choice
+kickassform.load(data);
+
+//hides the container .Form() was called on
+kickassform.hide();
+
+//shows the container .Form() was called on
+kickassform.show();
+
+//submits the form
+kickassform.submit();
+
+//focus the first element
+kickassform.focusFirst();
+
+//Will reset the form based on the defaultData option
+kickassform.reset();
+</pre>
+
+<h2 id="options">Options</h2>
+
+<p><code>Q.Form</code> accepts a few config options:</p>
+
+<pre class="prettyprint">
+{
+    dataTypes: {},
+    validationOptions: {},
+    defaultData: {},
+    resetInitially: false,
+    
+    //events!
+    onLoad: function(data){},
+    onSubmit: function(form){}
+}
+</pre>
+
+<h3>validationOptions option</h3>
+<p>Pass in validation options just like you would to the
+<a href="http://bassistance.de/jquery-plugins/jquery-plugin-validation/">Bassistance validation plugin</a>.
+</p>
+<pre class="prettyprint">
+var kickassform = $('.form-magic').Form({
+    validationOptions: {
+        rules: {
+            name: 'required',
+            age: 'required',
+            height: 'required',
+        }
+    }
+});
+</pre>
+
+<h3>dataTypes option</h3>
+
+<p>These tell the Form object how to render/handle the input element. You specify
+by a dictionary of name_of_element: type. Right now, this only supports type
+'int' and 'decimal'. Type 'int' will instantiate a <code>Q.IntBox</code> on the element
+which will only allow integers to be typed into the box. Type 'decimal' will instantiate a
+<code>Q.DecimalBox</code> and will only allow decimals to be entered. <code>dataTypes</code>
+is extensible. Their behavior is defined in <code>Q.Form.dataTypes</code>. So you can add your
+own. For instance, a 'date' type that popped a date picker would be useful.</p>
+
+<pre class="prettyprint">
+var kickassform = $('.form-magic').Form({
+    dataTypes: {
+        age: 'int',
+        height: 'decimal'
+    }
+});
+</pre>
+
+<h3>defaultData option</h3>
+
+<p>You can specify the 'reset' data for a form. When you call <code>reset()</code> or set
+the <code>resetInitially</code> option to true, the form will load this data. If you don't
+specify an element, it will just leave it blank.</p>
+
+<pre class="prettyprint">
+var kickassform = $('.form-magic').Form({
+    defaultData: {
+        age: 0,
+        height: '0.0',
+        like_trains: true,
+        am: 'home'
+    }
+});
+</pre>
+
+<h3>val() function</h3>
+
+<p><code>val()</code> works like jQuery <code>val()</code>, except it takes a string name as the first
+parameter. What if we wanted to get the value of the radio buttons in the example above?</p>
+
+<pre class="prettyprint">
+kickassform.val('am');
+</pre>
+
+<h3>load() function</h3>
+
+<p><code>load()</code> loads a dictionary into the form. </p>
+
+<pre class="prettyprint">
+kickassform.load({
+    name: 'Jim Reynolds',
+    age: '25',
+    height: '6.3',
+    like_chicken: true,
+    like_drinking: true,
+    am: 'summersaults'
+});
+</pre>
+
+<h2 id="working-example">Working Example</h2>
+
+<p>Let's see this thing with everything attached.</p>
+
+<div id="example2" class="example">
+    <h4>Q.Form Example 1</h4>
+    
+    <p>This one is functional. It has validation, enforces ints in the age box and decimals in the
+    height box, has a reset, and handles events.</p>
+    
+    <div class="form-magic">
+        <form>
+            <div><label>Name</label>
+            <input type="text" name="name"/></div>
+            
+            <div><label>Age</label>
+            <input type="text" name="age"/></div>
+            
+            <div><label>Height in Feet</label>
+            <input type="text" name="height"/></div>
+            
+            <div><label>I Like</label>
+                <div>
+                    <input type="checkbox" name="like_trains"/> Trains <br/>
+                    <input type="checkbox" name="like_lamp"/> Lamp <br/>
+                    <input type="checkbox" name="like_drinking"/> Drinking <br/>
+                    <input type="checkbox" name="like_chicken"/> Chicken strips with BBQ sauce
+                </div>
+            </div>
+            
+            <div><label>I Am</label>
+            <div>
+                <input type="radio" name="am" value="home"/> At home <br/>
+                <input type="radio" name="am" value="on_boat"/> On a boat <br/>
+                <input type="radio" name="am" value="summersaulting"/> Doing summersaults  <br/>
+                <input type="radio" name="am" value="eating_chicken"/> Eating Chicken strips with martha fookin BBQ sauce
+            </div></div>
+            
+            <div><input type="submit" value="Submit"/></div>
+        </form>
+    </div>
+    <p class="actions">
+        <a href="#" class="reset">Reset</a>
+        <a href="#" class="load">Load data</a>
+        <a href="#" class="hide">Hide</a>
+        <a href="#" class="show">Show</a>
+        <a href="#" class="submit">Submit</a>
+        <a href="#" class="get">Get the value of 'I Am'</a>
+    </p>
+</div>
+
+<h2 id="asyncform">Q.AsyncForm</h2>
+
+<p><code>Q.AsyncForm</code> is an extension of form <code>Q.Form</code> handling async
+submission of your form. In addition to <code>Q.Form</code>'s options, <code>Q.AsyncForm</code>
+has a couple more</p>
+
+<h3>loaderLocation option</h3>
+
+<p>A dictionary passed into the <code>Q.Loader</code>'s location option.</p>
+
+<pre class="prettyprint">
+var kickassform = $('.form-magic').AsyncForm({
+    loaderLocation: {
+        position: 'absolute',
+        bottom: 5,
+        left: 5
+    }
+});
+</pre>
+
+<h3>ajaxOptions option</h3>
+
+<p>A dictionary passed to jQuery's <code>$.ajax</code> on form submission.</p>
+
+<pre class="prettyprint">
+var kickassform = $('.form-magic').AsyncForm({
+    ajaxOptions: {
+        dataType: 'json'
+    }
+});
+</pre>
+
+
+<h3>onSuccess callback option</h3>
+
+<p>A function that will be called when form submission succeeds.</p>
+
+<pre class="prettyprint">
+var kickassform = $('.form-magic').AsyncForm({
+    onSuccess: function(data){},
+});
+</pre>
+
+<h3>onFail callback option</h3>
+
+<p>A function that will be called when form submission fails according to the server.</p>
+
+<pre class="prettyprint">
+var kickassform = $('.form-magic').AsyncForm({
+    onFail: function(errorType, errors){},
+});
+</pre>
+
+<h2 id="asyncform-example">Q.AsyncForm Example</h2>
+
+<div id="example3" class="example">
+    <h4>Q.AsyncForm Example</h4>
+    
+    <p>Check the fail box to make the server respond with a failure. Check out
+    your console for more information.</p>
+    
+    <div class="form-magic">
+        <form method="post" action="/quaid/asyncform">
+            <div><label>Name</label>
+            <input type="text" name="name"/></div>
+            
+            <div><input type="checkbox" name="fail"/> Make this submisison fail</div>
+            
+            <div><input type="submit" value="Submit"/></div>
+        </form>
+    </div>
+</div>
+
+<pre class="prettyprint">
+var forma = $('#example3 .form-magic').AsyncForm({
+    validationOptions: {
+        rules: {
+            name: 'required',
+        }
+    },
+    onSuccess: function(data){
+        $.info('Q.AsyncForm succeeded. onSuccess called with params: ',
+            arguments)
+    },
+    onFail: function(errorType, errors){
+        $.info('Q.AsyncForm failed. onFail called with params: ',
+            arguments)
+    }
+});
+</pre>
+
+{% endblock %}

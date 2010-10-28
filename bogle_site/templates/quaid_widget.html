@@ -1,0 +1,275 @@
+{% extends "quaid_base.html" %}
+
+{% block title %}Quaid{% endblock %}
+
+{% block description %}{% endblock %}
+
+{% block keywords %}{% endblock %}
+
+{% block sidebar %}
+
+{% endblock %}
+
+{% block scriptfiles %}
+{{block.super}}
+<style>
+    
+</style>
+{% endblock %}
+
+{% block script %}
+{{block.super}}
+
+Q.currentPage = 'widget';
+$(document).ready(function(){
+    
+    Q.Loader.defaults.image = '/smedia/img/16x16_arrows.gif';
+    Q.Loader.defaults.location = {position: 'absolute', left: 5, top: 5};
+    
+    function upLoadingCount(loader, elem){
+        elem.find('.loading-count').text(loader.loadingCount);
+    }
+    
+    //example 1
+    var loader1 = $('#example1 .loading-block').Loader();
+    $('#example1 .start').click(function(){
+        loader1.startLoading();
+        upLoadingCount(loader1, $(this).parent());
+    });
+    $('#example1 .stop').click(function(){
+        loader1.stopLoading();
+        upLoadingCount(loader1, $(this).parent());
+    });
+    
+    //example 2
+    var loadCount = 0;
+    var loader2 = $('#example2 .lorems').AsyncLoader({
+        onPostLoad: function(){
+            upLoadingCount(this, this.container.parent());
+        }
+    });
+    $('#example2 .button').click(function(){
+        loadCount++;
+        
+        function success(data){
+            $('#example2 .lorems').append($('<p/>',{text: data.results}));
+        }
+        
+        loader2.load('/quaid/asyncload1', {num:loadCount, type: this.name}, success);
+        $(this).parent().find('.loads').text(loadCount);
+        upLoadingCount(loader2, $(this).parent());
+    });
+    
+    //example 3
+    var loadCount3 = 0;
+    var loader3 = $('#example3 form').SingleResourceAsyncLoader({
+        url: '/quaid/asyncload2',
+        onSuccess: function(data){
+            $('#example3 .result').text(data.results);
+        }
+    });
+    $('#example3 .load').click(function(){
+        loadCount3++;
+        loader3.load({num: loadCount3});
+        $(this).parent().find('.loads').text(loadCount3);
+    });
+    $('#example3 .reset').click(function(){
+        loadCount3 = 0;
+        $('#example3 .result').text(0);
+        $('#example3 .loads').text(0);
+        return false;
+    });
+});
+
+{% endblock %}
+
+{% block entrytitle %}Quaid Widget module{% endblock %}
+{% block entrycontent %}
+
+<p>Quaid's widget module contains generic widgets for your consumption. There are
+currently only three Classes in the widgets module.</p>
+
+<pre class="prettyprint">
+Q.Loader
+Q.AsyncLoader
+Q.SingleResourceAsyncLoader
+</pre>
+
+<h2 id="loader">Loader</h2>
+
+<p><code>Q.Loader</code> will help you deal with the display of a loading image inside a
+container. You instantiate it on the container of your choice, and the resulting object will
+have two functions: <code>startLoading()</code> and <code>stopLoading()</code>.
+<code>Q.Loader</code> can handle multiple calls to <code>startLoading()</code>. Inside is
+a counter that is incremented every time <code>startLoading()</code> is called, and
+decremented everytime <code>stopLoading()</code> is called. The image will show when the counter
+is greater than 0 and hide when the counter equals 0.</p>
+
+<div id="example1" class="example">
+    <h4>Q.Loader Tester</h4>
+    
+    <p>Use the buttons below to increment and decrement the loading count. The paragraph below
+    the buttons is the element Q.Loader was called on.</p>
+    
+    <form>
+        <p><input type="button" class="button start" value="Start Loading"/>
+        <input type="button" class="button stop" value="Stop Loading"/>
+        Loading Count: <b><span class="loading-count">0</span></b></p>
+    </form>
+    
+    <p class="loading-block">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse mattis facilisis lorem, ut auctor turpis blandit ac. Mauris sodales euismod lacinia. Morbi iaculis mattis dictum. Praesent orci felis, pretium sed lobortis at, mollis non sapien. Vivamus et magna at risus bibendum semper. Vivamus dignissim dui non enim consectetur quis malesuada augue blandit. Morbi eget purus vitae sapien vestibulum pharetra. Curabitur sit amet nibh condimentum justo varius feugiat. Nullam tempus eros quis est vulputate mattis. Curabitur luctus velit porta enim eleifend volutpat. Integer rutrum turpis erat, sed facilisis quam. Fusce accumsan facilisis magna, at posuere leo dictum id. Sed tincidunt leo a dolor vulputate interdum. Fusce tincidunt mauris orci. Nullam nisi purus, venenatis id volutpat eu, accumsan non orci. Morbi vel aliquet sapien. Donec mollis vehicula tellus eget placerat. Vivamus placerat cursus augue, vel condimentum enim pretium sit amet. Donec sit amet nulla turpis, id tincidunt diam. </p>
+    
+</div>
+
+<p>The code for this is pretty simple</p>
+
+<pre class="prettyprint">
+// setup the default image
+Q.Loader.defaults.image = '/smedia/img/16x16_arrows.gif';
+
+// setup default position of the loading image within the container
+// can be a CSS definition or 'center'
+Q.Loader.defaults.location = {position: 'absolute', left: 5, top: 5};
+
+// call the loader
+var loader1 = $('#example1 .loading-block').Loader();
+
+// display it/count up
+loader1.startLoading();
+
+// hide it/count down
+loader1.stopLoading();
+</pre>
+
+<h2 id="asyncloader">Async Loader</h2>
+
+<p><code>Q.AsyncLoader</code> extends <code>Q.Loader</code> and basically adds a
+<code>load()</code> function.</p>
+
+<pre class="prettyprint">Q.AsyncLoader.load(url, params, successfn, failfn);</pre>
+
+<p>This is useful when you have multiple buttons/links generating
+async requests against a single container. Maybe a table of rows with action links adding
+markup to the same div.
+Or maybe a couple buttons generating events that get added to a container.</p>
+
+<div id="example2" class="example">
+    <h4>Q.AsyncLoader Tester</h4>
+    
+    <p>Loading Count is the loader's internal count. 'Loads' will keep a counter of the number
+    of times you call load(). Click either button. Both use the same AsyncLoader.</p>
+    
+    <form>
+        <p>
+            <input type="button" class="button" name="a" value="Load A"/>
+            <input type="button" class="button" name="b" value="Load B"/>
+            Loading Count: <b><span class="loading-count">0</span></b>;
+            Loads: <b><span class="loads">0</span></b>
+        </p>
+    </form>
+    
+    <div class="lorems"></div>
+</div>
+
+<pre class="prettyprint">var loadCount = 0;
+var loader2 = $('#example2 .lorems').AsyncLoader({
+    onPostLoad: function(type, callbackArgs){
+        // Called when a request finishes no matter a success or fail.
+        // It is called after all the callbacks and after stopLoading()
+        // has been called.
+        //
+        // type will be 'success' or 'fail'
+        // callbackArgs will be a list of arguments that were
+        //     passed to the callback
+    }
+});
+$('#example2 .button').click(function(){
+    loadCount++;
+    
+    //our success callback
+    function success(data){
+        $('#example2 .lorems').append($('&lt;p/&gt;',{text: data.results}));
+    }
+    
+    //setup our params
+    var params = {num: loadCount, type: this.name};
+    
+    //call our AsyncLoader's data function
+    loader2.load('/quaid/asyncload1', params, success);
+});</pre>
+
+<h2 id="singleresourceloader">Single Resource Async Loader</h2>
+
+<p><code>Q.SingleResourceAsyncLoader</code> extends <code>Q.AsyncLoader</code>. It provides you
+with a way to make sure the consumer of the loader only gets the results of the most
+recent async request. This is useful in async widgets. At
+<a href="http://adroll.com">AdRoll</a>, we use this in our graph and table widgets. That
+way, if a user, say, filters data on a table twice in quick succession, and the first
+request takes longer, the table will still show the second request's results. It does this by
+aborting previous requests when a new request is made. Easy peasy.</p>
+
+<p>The interface is a bit different that <code>Q.AsyncLoader's</code>. Since you are working
+from a single resource, you specify the URL, and the success/fail handlers when you instantiate.</p>
+
+<pre class="prettyprint">var loadCount3 = 0;
+var srloader = $('#something').SingleResourceAsyncLoader({
+    url: '/my/resource',
+    onSuccess: function(data){
+        // do success stuff here
+    },
+    onFail: function(){
+        // do brokeass stuff here
+    }
+});
+</pre>
+
+<p>When you call <code>load()</code>, you only specify the params of the request.
+<code>Q.SingleResourceAsyncLoader</code> keeps a cache of the most recently used params in
+<code>srloader.lastParams</code>. If you do not specify params in the <code>load()</code>
+call, it'll use these cached params.</p>
+
+<pre class="prettyprint">
+srloader.load({date: '3-4-10'});
+
+// uses the cached params
+srloader.load();
+
+// adds on to the params
+// I find myself doing this pretty often.
+srloader.load( $.extend(srloader.lastParams, {filter_param: 'names'}) );
+</pre>
+
+<div id="example3" class="example">
+    <h4>Q.SingleResourceAsyncLoader Tester</h4>
+    
+    <p>Every odd numbered request will take over one second, every even numbered
+    request will take only a few ms. The problem would arise if we double clicked the button
+    below. If we did not abort the first request, the second would finish first, load its data into
+    the container, then the first would finish and overwrite the second request's data!</p>
+    
+    <form>
+        <p>
+            <input type="button" class="button load" value="Load"/>
+            Result should show: <b><span class="loads">0</span></b>
+            <br/>
+            <a href="#" class="reset">reset</a>
+        </p>
+    </form>
+    
+    <p>Result: <b><span class="result">0</span></b></p>
+</div>
+
+<pre class="prettyprint">var loadCount3 = 0;
+var loader3 = $('#example3 form').SingleResourceAsyncLoader({
+    url: '/quaid/asyncload2',
+    onSuccess: function(data){
+        $('#example3 .result').text(data.results);
+    }
+});
+$('#example3 .load').click(function(){
+    loadCount3++;
+    loader3.load({num: loadCount3});
+    $('#example3 .loads').text(loadCount3);
+});</pre>
+
+{% endblock %}

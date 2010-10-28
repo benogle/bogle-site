@@ -65,9 +65,7 @@ def client_async(func, *args, **kwargs):
         for k, v in e.errors.items():
             res['errors'].extend([{'value': None, 'message': unicode(msg), 'field': k} for msg in v])
     
-    #import pdb; pdb.set_trace()
-    
-    return HttpResponse(json.dumps(res), status=status)
+    return HttpResponse(json.dumps(res), status=status, mimetype='application/json')
 client_async = decorator(client_async)
 
 def index(req):
@@ -110,4 +108,108 @@ def example1(req):
         'mileage_message': miles == 100.0 and 'Nice job!' or 'Oops try again',
         'programmers': programmers,
         'programmers_message': programmers == 0 and 'Yeah, that\'s a hardware problem' or 'Sadly, no.',
+    }
+
+@client_async
+def asyncload1(req):
+    
+    import time
+    time.sleep(0.5)
+    
+    num = req.POST.get('num')
+    t = req.POST.get('type')
+    
+    types = {
+        'a': '%s Lorem Ipsum!' % num,
+        'b': '%s THIS IS B! zOMG!' % num
+    }
+    return types.get(t) or 'WTF y0?'
+
+@client_async
+def asyncload2(req):
+    
+    num = int(req.POST.get('num'))
+    
+    import time
+    time.sleep(num % 2)
+    
+    return str(num)
+    
+@client_async
+def asyncform(req):
+    
+    name = req.POST.get('name')
+    fail = req.POST.get('fail') != None
+    
+    import time
+    time.sleep(0.5)
+    
+    if fail:
+        raise ClientException('This is just an error of some kind.')
+    
+    return name
+
+def error_example(req):
+    type = req.POST.get('errtype')
+    """<select name="errtype">
+    <option value="none">None (success!)</option>
+    <option value="fail">200 OK fail</option>
+    <option value="bad_req">400 Bad Request (general error)</option>
+    <option value="bad_req_field">400 Bad Request (field error)</option>
+    <option value="server">500 Server Error</option>
+    <option value="not_found">404 Not Found</option>"""
+    
+    if type == 'fail':
+        res = {'status': 'fail', 'errors': [{'message': 'This is a 200 ok general error'}]}
+        status = 200
+    elif type == 'bad_req':
+        res = {'errors': [{
+            'message': 'This is a 400 Bad Request general error',
+            'code': 256,
+            'value': 'http://redirect.url'
+        }]}
+        status = 400
+    elif type == 'bad_req_field':
+        res = {'errors': [{
+            'message': 'This is a 400 Bad Request field error',
+            'field': 'email'
+        }]}
+        status = 400
+    elif type == 'server':
+        res = {'errors': [{
+            'message': 'AttributeError'
+        }]}
+        status = 500
+    elif type == 'not_found':
+        res = {'errors': [{
+            'message': 'Resource "id" was not found',
+            'value': '/some/resource/id'
+        }]}
+        status = 404
+    else:
+        res = {
+            'status': 'success',
+            'results':{
+                'data1': 23,
+                'data2': 'wowza'
+            }
+        }
+        status = 200
+    
+    return HttpResponse(json.dumps(res), status=status)
+
+@client_async
+def validation_example(req):
+    
+    class ExampleForm(forms.Form):
+        email = forms.EmailField(max_length=25)
+    form = validate(ExampleForm(req.POST))
+
+    email = form['email']
+    
+    if email.lower() in ['bob@zomg.com', 'jim@zomg.com']:
+        raise ClientException('Oops, the email "%s" is already taken' % email, field='email')
+    
+    return {
+        'email': email,
     }

@@ -20,6 +20,7 @@
 {% block script %}
 {{block.super}}
 
+Q.currentPage = 'log';
 $(document).ready(function(){
 
     for( var i = 0; i < $.log.LEVEL_ORDER.length; i++)
@@ -120,12 +121,24 @@ to 2 and only warn, error, and log messages will appear.</p>
     </form>
 </div>
 
-<pre class="prettyprint">
+<h2 id="failover">Failover</h2>
 
+<p>What if you're working on a browser that doesn't have a console? Quaid has a log
+failover mechanism. It will automatically load
+<a href="http://getfirebug.com/firebuglite">firebug lite</a> or the Quaid provided SimpleConsole when
+console.log is not detected. There are a couple properties you can set.</p>
+
+<pre class="prettyprint">
+$.log.failoverToFirebugLite = true;
+$.log.firebugLiteUrl = 'https://getfirebug.com/firebug-lite-beta.js';
 </pre>
 
-<h2>Failover</h2>
+<p>When <code>$.log.failoverToFirebugLite</code> is true, it will load firebug lite when necessary.
+If you set this property to false, Quaid will load SimpleConsole. I wrote SimpleConsole because
+firebug lite was too slow on my IE VM. SimpleConsole is <i>very</i> basic, though, and just captures
+log information.</p>
 
-<h2>Advanced</h2>
+<p>If you would like to disable failover, or have it failover to your own code, you can replace
+<code>$.log.failoverFn</code> with your own function.</p>
 
 {% endblock %}

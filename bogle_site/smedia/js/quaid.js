@@ -1,0 +1,1 @@
+../../../../quaid/build/jquery.quaid.min.js

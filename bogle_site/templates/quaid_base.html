@@ -10,13 +10,21 @@
 
 {% block script %}
 $(document).ready(function(){
-   prettyPrint(); 
+    prettyPrint();
+    $('#sidebar .'+Q.currentPage).addClass('current');
+    var headers = $('.entry-content h2');
+    var anchors = $('#article-anchors');
+    headers.each(function(){
+        if(this.id){
+            anchors.append($('<li/>').append($('<a/>',{
+                href: '#'+this.id,
+                text: $(this).text()
+            })));
+        }
+    });
 });
 {% endblock %}
 
-{% block sidebar %}
-
-{% endblock %}
 
 {% block scriptfiles %}
 <style>
@@ -26,11 +34,40 @@ $(document).ready(function(){
     .example form .chunk{margin: 5px 0;}
     .example .update{font-weight: bold;}
     .example label{display: block;}
+    .example form>div{margin: 10px 0;}
+    .example form>div label{font-weight: bold;}
     label.error{color: #f00;}
     .textbox {border: 1px solid #ccc; padding: 5px;}
     
     pre.prettyprint{-moz-border-radius: 4px;}
     .update-me{display:none;}
+    
+    .entry-left{position: relative;}
+    #sidebar{
+        position: absolute;
+        width: 150px;
+        padding: 10px 15px;
+        top: 5px;
+        left: -100px;
+        background: #eee;
+        -moz-border-radius: 4px;
+    }
+    #sidebar-content{}
+    #sidebar h2{
+        margin: 0px 0 10px 0;
+        font-size: 11pt;
+        color: #666;
+    }
+    #sidebar h3{
+        margin: 0px 0 5px 0;
+        font-size: 10pt;
+        color: #666;
+        border-bottom: 1px solid #ddd;
+    }
+    #sidebar ul{margin: 0 0 15px; padding: 0; list-style: none;}
+    #sidebar li{margin: 5px 0; padding: 0 0px; list-style: none;}
+    #sidebar li a.current{color: #555; font-weight: bold; border: none;}
+    #sidebar li a.current:hover{color: #444; border: none;}
 </style>
 
 <script type="text/javascript" src="/smedia/js/jquery.form.js"></script>
@@ -47,7 +84,34 @@ $(document).ready(function(){
 	
     <h2 class="entry-title">{% block entrytitle %}{% endblock %}</h2>
     
-    <div class="entry-left"><div class="entry-image"></div></div>
+    <div class="entry-left">
+    {% block sidebr %}
+    <div id="sidebar">
+        <div id="sidebar-content">
+            <ul>
+                <li><a href="/quaid" class="overview">Overview</a></li>
+                <li><a href="/quaid/api/index.html">API Docs</a></li>
+                <li><a href="http://github.com/benogle/quaid">Code</a></li>
+            </ul>
+            <h3>on this page</h3>
+            
+            <ul id="article-anchors">
+                
+            </ul>
+            
+            <h3>modules</h3>
+            <ul>
+                <li><a href="/quaid/core" class="core">Core</a></li>
+                <li><a href="/quaid/form" class="form">Form</a></li>
+                <li><a href="/quaid/log" class="log">Log</a></li>
+                <li><a href="/quaid/util" class="util">Util</a></li>
+                <li><a href="/quaid/validation" class="validation">Validation</a></li>
+                <li><a href="/quaid/widget" class="widget">Widget</a></li>
+            </ul>
+        </div>
+    </div>
+    {% endblock %}
+    </div>
     
 	<div class="entry">
 		<div class="entry-content">

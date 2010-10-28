@@ -16,11 +16,13 @@ a, img{
 }
 
 a, a:active, a:visited {
-    color: #679fda;
+    color: #3A93D7;
     text-decoration: none;
     outline: 0;
+    border-bottom: 1px dotted #679fda;
 }
 a:hover {
+    color: #679fda;
     text-decoration: none;
     border-bottom: 1px dotted #679fda;
 }
@@ -283,15 +285,7 @@ pre.prettyprint, pre.command {
     border: none;
 }
 
-.entry p a{
-	background: #82c4f5;
-	padding: 0px 5px;
-	color: #fff;
-}
-.entry p a:hover{
-	border: 0;
-	background: #91ceff;
-}
+
 
 .meta-sep{
     font-size: 1.2em;

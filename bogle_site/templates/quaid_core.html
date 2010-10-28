@@ -19,6 +19,7 @@
 
 {% block script %}
 {{block.super}}
+Q.currentPage = 'core';
 $(document).ready(function(){
     //example 1
     var Animal = Class.extend({
@@ -166,11 +167,11 @@ alert(mycat.sound());
 <p>Quaid adds the ability to seamlessly turn these new classes into jQuery plugins.
 This lets you build really modular stateful plugins that are easy to maintain.</p>
 
-</h2>We'll start building a toggler plugin for
+<p>We'll start building a toggler plugin for
 demonstration purposes. This plugin will toggle a chunk of markup when some trigger is clicked.
 Hopefully this process will touch on everything you can do with the Core module. </p>
 
-<h2>Basics</h2>
+<h2 id="basics">Basics</h2>
 
 <p>To start, all we have to do is add a plugin name string before the object in
 Class.extend, and accept two parameters in the constructor (the init() function):
@@ -228,7 +229,7 @@ manually if you'd like. You will not get the caching functionality, though. To d
 
 <pre class="prettyprint">var mytoggler = new Q.Toggler($('#toggled'), { /* settings */ });</pre>
 
-<h2>Useful Example</h2>
+<h2 id="useful-example">Useful Example</h2>
 
 <p>Let's make our toggle do something useful: toggle markup.</p>
 
@@ -291,7 +292,7 @@ from outside. I usually prefix my 'private' functions with _. This is just conve
 does not support the concept of actual private functions. :)
 </p>
 
-<h2>Static Members</h2>
+<h2 id="static-members">Static Members</h2>
 
 <p>Quaid has provision for declaring static members of the class inline with the rest of
 the class definition. This is useful for defaults. Defining defaults as accessable outside
@@ -340,7 +341,7 @@ Q.Toggler.defaults = {
 
 <p>Use whichever you find cleanest.</p>
 
-<h2>Quaid Plugins on jQuery Object With Mutiple Elements</h2>
+<h2 id="multiple-elements">Mutiple Elements</h2>
 
 <p>What happens when you call a Quaid plugin on a jQuery object wrapping muliple elements?
 It will return an array of your objects.</p>
@@ -383,7 +384,7 @@ var mytogglers = $('.toggled2').Toggler({
 // Check out your console to see!
 $.log('My Togglers:', mytogglers); </pre>
     
-<h2>Inheritance</h2>
+<h2 id="inheritance">Inheritance</h2>
 
 <p>Now we have and awesome Toggler class. But it doesn't animate! We need it to be much
 fancier. So we create a new plugin that overrides the open and close functions.</p>

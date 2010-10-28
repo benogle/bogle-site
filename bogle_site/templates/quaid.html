@@ -20,6 +20,7 @@
 {% block script %}
 {{block.super}}
 
+Q.currentPage = 'overview';
 $(document).ready(function(){
     
     Q.Loader.defaults.image = '/smedia/img/16x16_arrows.gif';
@@ -104,10 +105,10 @@ $(document).ready(function(){
 {% block entrytitle %}Quaid{% endblock %}
 {% block entrycontent %}
 
-<p>Quaid is a javascript library on top of jQuery that helps you write cleaner, more-robust code.
+<p>Quaid is a javascript library that works with jQuery to help you write cleaner, more-robust code.
 You can think of it as a little framework with which to easily build widgets and
 other stateful jQuery plugins, but I like to think it is a bit more than that. 
-I've found that with each new web app project I start, I come up against two pretty fundamental
+Before Quaid, I regularly bumped up against two pretty fundamental
 problems:</p>
 
 <ul>
@@ -115,18 +116,22 @@ problems:</p>
     <li>How do I handle errors from async requests without cruft?</li>
 </ul>
 
-<p>Quaid grew out of a number of attempts to answer these questions. Along the way,
+<p>Quaid grew out of a number of attempts to answer these questions over a period of about
+a year and a half at <a href="http://adroll.com">AdRoll</a>. Along the way,
 I found myself writing the same basic code for a couple things:</p>
 
 <ul>
-    <li>Logging that has levels and can be enabled/disabled.</li>
+    <li>Logging with different levels and a global enable/disable.</li>
     <li>General async request utilities like avoiding race conditions, connecting the form plugin to
     the validation plugin, handling loading images, etc.</li>
     <li>Data formatters to convert data (numbers, dates, etc) from the server to human readable formats.</li>
 </ul>
 
-<p>So Quaid has those too. This may seem like a random collection of tools to be in one library,
-so let's see how it all fits together.</p>
+<p>So Quaid has those too. This may seem like a random collection of tools to be in one library.
+Let's see how it all fits together.</p>
+
+<h2 id="big-example">Big Fat Example</h2>
+<p>I'll start with a pretty comprehensive example so you can get a feel for it.</p>
 
 <p>Assume you have to build an ajaxey form. You want your real validation
     to be done on the server, and maybe some superficial convenience stuff to be checked on the
@@ -156,15 +161,16 @@ so let's see how it all fits together.</p>
 <p>Notice that the required validation check is done by the client, but all other
 validation is done on the server. The neat thing is that both validation issues from
 the server and the client run through the same mechanism in the
-<a href="http://bassistance.de/jquery-plugins/jquery-plugin-validation/">Bassistance validation plugin</a>.
-You probably want to see what Quaid looks like. Here:</p>
+<a href="http://bassistance.de/jquery-plugins/jquery-plugin-validation/">Bassistance validation plugin</a>.</p>
 
 <pre class="prettyprint">
-// We create a plugin called UpdateForm that extends Quaid provided Q.AsyncForm
+// We create a plugin called UpdateForm that extends
+// Quaid provided Q.AsyncForm
 Q.AsyncForm.extend('UpdateForm', {
     
     // You can specify static members this way.
-    // For example, these defaults will be available via Q.UpdateForm.defaults
+    // For example, these defaults will be available via
+    // Q.UpdateForm.defaults
     defaults: {
         blockToUpdate: null,
         dataFormats: {},
@@ -178,7 +184,8 @@ Q.AsyncForm.extend('UpdateForm', {
         
         // We call Q.AsyncForm's constructor passing it settings
         // which may be overriden by the user.
-        this._super(container, $.extend({}, this._class.defaults, settings))
+        settings = $.extend({}, this._class.defaults, settings)
+        this._super(container, settings)
         this._block = $(this.settings.blockToUpdate);
     },
     
@@ -186,12 +193,14 @@ Q.AsyncForm.extend('UpdateForm', {
     onSuccess: function(data){
     
         // We loop through the results, format the data according to
-        // the formats specified in the settings, then we put the server's
-        // data into the markup.
+        // the formats specified in the settings, then we put the
+        // server's data into the markup.
         for(var k in data.results){
             
             // Format the raw data from the server based on settigns
-            var formattedData = Q.DataFormatters.get(this.settings.dataFormats[k], data.results[k]);
+            var formattedData = Q.DataFormatters.get(
+                                    this.settings.dataFormats[k],
+                                    data.results[k]);
             
             // Server's key matches some element's class name.
             this._block.find('.'+k).text(formattedData);
@@ -208,7 +217,8 @@ $('#example1').UpdateForm({
     // Where to put the data from the server
     blockToUpdate: '#example1 .update-me',
     
-    // Tells our plugin how to interpret the data coming back from the server
+    // Tells our plugin how to interpret the data
+    // coming back from the server
     dataFormats: {
         mileage: 'decimal(1)',
         programmers: 'number'
@@ -230,7 +240,20 @@ $('#example1').UpdateForm({
 });
 </pre>
 
-<h2>Quaid is broken down into six modules</h2>
+<h2 id="code organization">Code Organization</h2>
+
+<h2 id="production-example">Production Example</h2>
+
+<p>Quaid is running in production at <a href="http://adroll.com">AdRoll</a>. Most of the
+interesting stuff is on the advertiser's dashboard.
+<a href="http://adroll.com/account/signin">Login</a> to adroll with user: demo,
+password: retargeting.</p>
+
+<p>talk about how all plugins are wrapped in quaid classes...</p>
+
+<h2 id="modules">Modules</h2>
+
+<p>Quaid is broken down into six modules.</p>
 
 <h3><a href="/quaid/core">Core</a></h3>
 <p>The core implements the Class pattern and a mechanism for connecting your shiny newy classes
