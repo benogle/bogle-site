@@ -24,7 +24,8 @@ Q.currentPage = 'overview';
 $(document).ready(function(){
     
     Q.Loader.defaults.image = '/smedia/img/16x16_arrows.gif';
-    Q.Loader.defaults.location = {position: 'absolute', right: 5, top: 5};
+    Q.Loader.defaults.location = {position: 'absolute', left: 5, top: 5};
+    
     // We create a plugin called UpdateForm that extends Quaid provided Q.AsyncForm
 	Q.AsyncForm.extend('UpdateForm', {
         
@@ -98,6 +99,39 @@ $(document).ready(function(){
         }
     });
     
+    var loader1 = $('#loader-example .loading-block').Loader();
+    $('#loader-example .start').click(function(){
+        loader1.startLoading();
+    });
+    $('#loader-example .stop').click(function(){
+        loader1.stopLoading();
+    });
+    
+    var forma = $('#form-example .form-magic').AsyncForm({
+        validationOptions: {
+            rules: {name: 'required'}
+        },
+        onSuccess: function(data){
+            $('#form-example .name').text(data.results);
+        }
+    });
+    
+    $('#validation-example').AsyncForm({
+        validationOptions:{
+            rules: {
+                email: {asyncError: true}
+            }
+        },
+        onSuccess: function(data){
+            this.container.find('.results').show().text(
+                'Hey, good job ' + data.results.email
+            );
+        },
+        onFail: function(){
+            this.container.find('.results').hide();
+        }
+    });
+    
 });
 
 {% endblock %}
@@ -105,35 +139,52 @@ $(document).ready(function(){
 {% block entrytitle %}Quaid{% endblock %}
 {% block entrycontent %}
 
-<p>Quaid is a javascript library that works with jQuery to help you write cleaner, more-robust code.
+<p>Quaid is a JavaScript library that works with jQuery to help you write cleaner, more-robust code.
 You can think of it as a little framework with which to easily build widgets and
-other stateful jQuery plugins, but I like to think it is a bit more than that. 
-Before Quaid, I regularly bumped up against two pretty fundamental
-problems:</p>
+other stateful jQuery plugins. Quaid provides two main services: a more
+<a href="#core">modular</a>
+way to write complex JavaScript applications with jQuery, and a robust way to
+<a href="#validation">handle errors</a> from async
+server requests. Also included for convenience is multi-level, cross-browser
+<a href="#log">logging</a> with failover, a small framework for
+<a href="#util">data formatting</a>,
+and <a href="#form">form handling</a> utilities.</p>
 
-<ul>
-    <li>How do I organize my js into clean, logical, maintainable chunks?</li>
-    <li>How do I handle errors from async requests without cruft?</li>
-</ul>
+<p>Quaid grew pretty organically over a period of about
+a year and a half at <a href="http://adroll.com">AdRoll</a>. So while it may seem like a
+kind of random smattering of tools, they work well together to make a solid
+minimum tool set for your app.</p>
 
-<p>Quaid grew out of a number of attempts to answer these questions over a period of about
-a year and a half at <a href="http://adroll.com">AdRoll</a>. Along the way,
-I found myself writing the same basic code for a couple things:</p>
 
-<ul>
-    <li>Logging with different levels and a global enable/disable.</li>
-    <li>General async request utilities like avoiding race conditions, connecting the form plugin to
-    the validation plugin, handling loading images, etc.</li>
-    <li>Data formatters to convert data (numbers, dates, etc) from the server to human readable formats.</li>
-</ul>
+<h2 id="dependencies">Dependencies</h2>
 
-<p>So Quaid has those too. This may seem like a random collection of tools to be in one library.
-Let's see how it all fits together.</p>
+<p>jQuery is the main dependency. If you use Quaid's form module, you will need
+<a href="http://jquery.malsup.com/form/">Mike Alsup's form plugin</a>, and if you want
+Quaid's validation module to integrate into your client side validaiton scheme, you need the
+<a href="http://bassistance.de/jquery-plugins/jquery-plugin-validation/">Bassistance validation plugin</a>.</p>
+
+<p>Quaid's six modules are not all necessary. Only core, log and util are totally necessary.
+You can build your own distribution with the <code>build.py</code> script in the source tree's
+root.</p>
+
+<pre class="prettyprint">
+# will build the minimum set
+python build.py core log util
+
+# will build all
+python build.py
+</pre>
+
+<h2 id="production-example">Getting it</h2>
+
+<p>Quaid is on github at <a href="http://github.com/benogle/quaid">http://github.com/benogle/quaid</a>.</p>
+
+<p><a href="http://github.com/benogle/quaid/raw/master/build/jquery.quaid.min.js">Version 0.1.0 - 19.8k minified</a></p>
 
 <h2 id="big-example">Big Fat Example</h2>
 <p>I'll start with a pretty comprehensive example so you can get a feel for it.</p>
 
-<p>Assume you have to build an ajaxey form. You want your real validation
+<p>Assume you have to build an async form. You want your real validation
     to be done on the server, and maybe some superficial convenience stuff to be checked on the
     client side. The user shouldn't see the client and server validation as any different,
     and he needs feedback when the page is waiting for the server. When the form
@@ -240,7 +291,179 @@ $('#example1').UpdateForm({
 });
 </pre>
 
-<h2 id="code organization">Code Organization</h2>
+<h2 id="code organization">Philosophy</h2>
+
+<p>Writing easily maintainable code for the front end is difficult. How do you properly abstract
+a chunk of HTML? How do you write it in such a way that the code makes sense in a month
+when you come back to it? How about writing it so another human can make sense of it and potentially
+extend it?</p>
+
+<p>I feel the problem in writing good code for the front end is a problem of encouragement.
+I often feel I am encouraged to be sloppy. jQuery, while amazing, encourages me to write simple
+plugins that store state in the DOM via <code>$.data()</code>, then chain them together and
+bury them in layers of callbacks. This is problematic for maintinence and debugging.</p>
+
+<p>My goal with Quaid is to encourage you to build plugins a different way. Instead of applying
+a chain of plugin calls to some element or collection of elements, Quaid helps you create a
+meaningful, consistent API for your chunk of markup.</p>
+
+<p>The more detailed <a href="/quaid/core">core</a> docs walk through building a basic
+plugin that toggles markup. With Quaid, the resulting plugin is simple, readable, flexible,
+and extensible.</p>
+
+<h2 id="modules">Module Overview</h2>
+
+<p>Quaid is broken down into six modules.</p>
+
+<h3 id="core"><a href="/quaid/core">Core</a></h3>
+<p>The core implements the Class pattern and a mechanism for connecting your shiny new classes
+to jQuery. Here's how you might create a toggler with Quaid.</p>
+
+<pre class="prettyprint">
+Q.Toggler = Class.extend('Toggler', {
+    init: function(container, settings){
+        var defaults = {
+            trigger: null, // give me a string or jQuery object
+        };
+        this._super(container, $.extend({}, defaults, settings));
+        
+        $(this.settings.trigger).click(function(){
+            self.toggle();
+            return false;
+        });
+    },
+    
+    close: function(){this.container.hide();},
+    open: function(){this.container.show();},
+    
+    toggle: function(){
+        if(this.container.css('display') == 'none')
+            this.open();
+        else
+            this.close();
+    }
+});
+var mytoggler = $('#toggled1').Toggler({trigger: '#trigger1'});
+
+// The result object has the functions you defined.
+mytoggler.toggle();
+mytoggler.open();
+mytoggler.close();
+</pre>
+
+<h3 id="log"><a href="/quaid/log">Log</a></h3>
+<p>The log module defines a new log interface. It utilizes all the console[x]() functions and has failovers
+when they aren't available. For example, it can failover to firebug lite, or an even lighter
+'SimpleConsole' that is included with Quaid. It defines new log methods</p>
+
+<pre class="prettyprint">
+$.debug(); //level 0
+$.info();  //level 1
+$.warn();  //level 2
+$.error(); //level 3
+$.log();   //level 4
+
+$.log.enabled = true;
+</pre>
+
+<h3 id="widget"><a href="/quaid/widget">Widget</a></h3>
+<p>Right now the widget module implements the Loader classes which handle loading images for you.</p>
+
+<pre class="prettyprint">
+var loader = $('#loader-example .loading-block').Loader();
+
+// hide or show it.
+loader.startLoading();
+loader.stopLoading();
+</pre>
+    
+<div id="loader-example" class="example">
+    <h4>Q.Loader Tester</h4>
+    
+    <form>
+        <p><input type="button" class="button start" value="Start Loading"/>
+        <input type="button" class="button stop" value="Stop Loading"/>
+    </form>
+    
+    <p class="loading-block">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse mattis facilisis lorem, ut auctor turpis blandit ac. Mauris sodales euismod lacinia. Morbi iaculis mattis dictum. Praesent orci felis, pretium sed lobortis at, mollis non sapien. Vivamus et magna at risus bibendum semper. Vivamus dignissim dui non enim consectetur quis malesuada augue blandit. Morbi eget purus vitae sapien vestibulum pharetra. Curabitur sit amet nibh condimentum justo varius feugiat. </p>
+    
+</div>
+
+<h3 id="form"><a href="/quaid/form">Form</a></h3>
+<p>The form module provides classes to encapsulate forms.
+Form handling shouldn't be a pain. This
+module eases the burn.</p>
+
+<div id="form-example" class="example">
+    <h4>Q.AsyncForm Example</h4>
+    
+    <p>Check the fail box to make the server respond with a failure. Check out
+    your console for more information.</p>
+    
+    <div class="form-magic">
+        <form method="post" action="/quaid/asyncform">
+            <div><label>Name</label>
+            <input type="text" name="name"/></div>
+            
+            <div><input type="submit" value="Submit"/></div>
+        </form>
+    </div>
+    <p class="name"></p>
+</div>
+
+<pre class="prettyprint">
+var forma = $('#form-example .form-magic').AsyncForm({
+    validationOptions: {
+        rules: {name: 'required'}
+    },
+    onSuccess: function(data){
+        $('#form-example .name').text(data.results);
+    }
+});
+</pre>
+
+<h3 id="util"><a href="/quaid/util">Util</a></h3>
+<p>What library would be complete without a util module? This one provides data formatting
+capabilities and functions I felt were missing from jQuery.</p>
+
+<pre class="prettyprint">
+// parses a date
+var date = $.parseDate('3.10.2010', 'm.d.Y H:M');
+
+// formats data
+// formatted = '1,011.482'
+var formatted = Q.DataFormatters.get('decimal(3)', 1011.482389892);
+// formatted = '$1.48'
+var formatted = Q.DataFormatters.get('dollar', 1.482389892);
+</pre>
+
+<h3 id="validation"><a href="/quaid/validation">Validation</a></h3>
+<p>The validation module handles errors from your server and
+connects your server's async responses to the
+<a href="http://bassistance.de/jquery-plugins/jquery-plugin-validation/">Bassistance validation plugin</a>..
+</p>
+
+<div id="validation-example" class="example">
+    <h4>Validation Example</h4>
+    
+    <p>This simply takes an email address. It can fail in a multitude of ways: if no email is
+    present, if you enter bob@zomg.com, if it is longer than 25 characters, and if it is not
+    a valid email address. All validation is done on the server. Check out your console.</p>
+    
+    <div class="form-magic">
+        <form method="post" action="/quaid/validation_example">
+            <div>
+                <label>Email</label>
+                <input type="text" name="email"/>
+            </div>
+            
+            <div><input type="submit" value="Submit"/></div>
+            
+        </form>
+        
+        <div class="results"></div>
+    </div>
+</div>
 
 <h2 id="production-example">Production Example</h2>
 
@@ -248,37 +471,4 @@ $('#example1').UpdateForm({
 interesting stuff is on the advertiser's dashboard.
 <a href="http://adroll.com/account/signin">Login</a> to adroll with user: demo,
 password: retargeting.</p>
-
-<p>talk about how all plugins are wrapped in quaid classes...</p>
-
-<h2 id="modules">Modules</h2>
-
-<p>Quaid is broken down into six modules.</p>
-
-<h3><a href="/quaid/core">Core</a></h3>
-<p>The core implements the Class pattern and a mechanism for connecting your shiny newy classes
-to jQuery</p>
-
-<h3><a href="/quaid/log">Log</a></h3>
-<p>The log module is all about logging. It utilizes all the console.x() functions and has failovers
-when they aren't available. For example, it can failover to firebug lite, or an even lighter
-'SimpleConsole' that is included with Quaid.</p>
-
-<h3><a href="/quaid/widget">Widget</a></h3>
-<p>Right now the widget module implements the Loader classes which handle loading images for you.</p>
-
-<h3><a href="/quaid/form">Form</a></h3>
-<p>The form module provides classes to encapsulate forms. Form handling shouldn't be a pain. This
-module eases the burn.</p>
-
-<h3><a href="/quaid/util">Util</a></h3>
-<p>What library would be complete without a util module? This one provides data formatting
-capabilities and functions I felt were missing from jQuery.</p>
-
-<h3><a href="/quaid/validation">Validation</a></h3>
-<p>The validation module connects your async responses to the
-<a href="http://bassistance.de/jquery-plugins/jquery-plugin-validation/">Bassistance validation plugin</a>
-and provides some other handy async response features.
-</p>
-
 {% endblock %}

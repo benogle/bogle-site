@@ -199,7 +199,7 @@ First, some markup:</p>
 var mytoggler = $('#toggled').Toggler({ /* settings go here */ });
 </pre>
 
-<p>When this line is called, the Toggler.init() function we defined earlier is passed
+<p>When this line is called, the <code>Toggler.init()</code> function we defined earlier is passed
 <code>$('#toggled')</code> in the <code>container</code> parameter, and
 <code>{ /* settings go here */ }</code> into the <code>settings</code> parameter.</p>
 
@@ -215,7 +215,7 @@ mytoggler.container // will be the $('#toggled') jQuery object
 mytoggler.settings  // will be the settings object you passed in
 </pre>
 
-<p>Also, Quaid caches the object it creates with jQuery.data(). So if we were to call
+<p>Also, Quaid caches the object it creates with <code>jQuery.data()</code>. So if we were to call
 <code>$('#toggled').Toggler()</code> again, the object would be equal to <code>mytoggler</code>.
 You can get this cached object by calling</p>
 
@@ -224,14 +224,14 @@ You can get this cached object by calling</p>
 
 <p>Quaid adds a new variable to the global scope: <code>Q</code>. All Quaid plugins hang
 off of this namespace. Whenever you create a plugin, it will be added to <code>Q</code>. Our new
-Toggler is accessable via <code>Q.Toggler</code>. You can instantiate your new plugin
+Toggler is accessible via <code>Q.Toggler</code>. You can instantiate your new plugin
 manually if you'd like. You will not get the caching functionality, though. To do so</p>
 
 <pre class="prettyprint">var mytoggler = new Q.Toggler($('#toggled'), { /* settings */ });</pre>
 
 <h2 id="useful-example">Useful Example</h2>
 
-<p>Let's make our toggle do something useful: toggle markup.</p>
+<p>Let's make our toggler do something useful: toggle markup.</p>
 
 <div id="example1" class="example">
     <h4>Simple Toggler!</h4>
@@ -297,7 +297,7 @@ does not support the concept of actual private functions. :)
 <p>Quaid has provision for declaring static members of the class inline with the rest of
 the class definition. This is useful for defaults. Defining defaults as accessable outside
 of the class definition is great as another part of the application can set the plugin's defaults.
-All Quaid's builtin plugins define their defaults this way.</p>
+All Quaid's built-in plugins define their defaults this way.</p>
 
 <pre class="prettyprint">Class.extend('Toggler',{
         // Static member declaration!
@@ -341,9 +341,9 @@ Q.Toggler.defaults = {
 
 <p>Use whichever you find cleanest.</p>
 
-<h2 id="multiple-elements">Mutiple Elements</h2>
+<h2 id="multiple-elements">Multiple Elements</h2>
 
-<p>What happens when you call a Quaid plugin on a jQuery object wrapping muliple elements?
+<p>What happens when you call a Quaid plugin on a jQuery object wrapping multiple elements?
 It will return an array of your objects.</p>
 
 <div id="example2" class="example">
@@ -386,7 +386,7 @@ $.log('My Togglers:', mytogglers); </pre>
     
 <h2 id="inheritance">Inheritance</h2>
 
-<p>Now we have and awesome Toggler class. But it doesn't animate! We need it to be much
+<p>Now we have an awesome <code>Toggler</code> class. But it doesn't animate! We need it to be much
 fancier. So we create a new plugin that overrides the open and close functions.</p>
 
 <div id="example3" class="example">
@@ -419,11 +419,11 @@ var ftoggler = $('#ftoggled').FancyToggler({trigger: '#ftrigger'});</pre>
 
 <h2 id="why-meaningful-objects">Why Doesn't Quaid Return jQuery Objects?</h2>
 
-<p>Now for a little philosophy. Quaid plugins do not return jQuery objects.
+<p>Quaid plugins do not return jQuery objects.
 They return objects with attributes as you define them in your class/plugin. How come?</p>
 
 <p>When I am writing front-end code for a complex project, I want to abstract chunks of HTML.
-I want to take a bit of markup and give it a meaningful api. By returning a jQuery object
+I want to take a bit of markup and give it a meaningful API. By returning a jQuery object
 I am getting back a whole bunch of functions and attributes that have nothing to do with my chunk of
 markup. Let's extend our toggler example. What if Quaid returned a jQuery object? The return
 object for instantiation of the Toggler plugin would be the original element with no context.
@@ -464,7 +464,7 @@ this on already have an underlying Toggler object? In this case it is obvious, b
 experience with jQuery UI, it is not. This API does not give me full access
 to the underlying object. I cannot inspect attributes of the object, I cannot call private
 methods, and I cannot override anything to extend functionality. I was sufficiently frustrated
-with jQuery UI's chioce with this API, that I wrote a special Quaid Class.extend function
+with jQuery UI's choice with this API, that I wrote a special Quaid Class.extend function
 to wrap jqUI objects. All of the dialogs on <a href="http://adroll.com">AdRoll</a> are
 Q.AdrollDialogs which extend ui.dialog. I also wrote a few special dialogs extending
 Q.AdrollDialogs like MediaDialog to handle the display of images and flash objects (flash
@@ -485,8 +485,8 @@ realObj.toggle();
 
 <p>I'm sure a concern with Quaid's choice is that of chainability. I confess that I really never
 use the chainability feature. I have been using Quaid in various incarnations for
-over a year and I have never once thougt it needed to be able to be chained together. In one
-of the earlier Quaid implementations, I wrote a few plugins that returned jQuery objects. I
+over a year and I have never needed to chain any plugins together. One
+of the earlier Quaid implementations returned jQuery objects. I
 found myself grabbing the cached version of the object every time I used those plugins. Something
 to the effect of
 

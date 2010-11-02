@@ -76,25 +76,25 @@ scheme has two parts: culling errors from the response for each request and atte
 do something with them via integration with the
 <a href="http://bassistance.de/jquery-plugins/jquery-plugin-validation/">Bassistance validation plugin</a>.</p>
 
-<h2 id="error_handling">Error Handling</h2>
+<h2 id="basics">Basics</h2>
 
 <p>Quaid's validation module installs a shim in between each request and the callbacks your
 application receives. It does this by patching jQuery's $.ajax function. A new requirement is placed
-on the server's response. You must specify a <code>status</code> param with a value of either
-<code>success</code> or <code>fail</code>. When your server says all is peachy, you simply return
-success with the rest of your data. Quaid will pass it on to your success handler as if there
+on the server's response. Quaid needs to know whether or not your response is a success or fail.
+When your server says all is peachy, you simply return your data.
+Quaid will pass it on to your success handler as if there
 were no shim at all</p>
 
 <pre class="prettyprint">
 // Server says:
 // 200 OK
-{status: 'success', otherData: 23, ...}
+{someData: 23, ...}
 </pre>
 
-<p>When your server has an error you can do one of two things: set <code>status</code> param
-to <code>fail</code> or return a response with HTTP status code greater than or equal to 400.
+<p>When your server has an error you can do one of two things: set a <code>status</code> param
+to <code>fail</code> or return a response with HTTP status code somewhere in the 400s.
 You return your errors in a list of dictionaries under the response's <code>error</code>
-field.</p>
+field. Each error must have, at a minimum, a <code>message</code> field.</p>
 
 <pre class="prettyprint">
 // Server says:
@@ -117,7 +117,7 @@ field.</p>
 }
 </pre>
 
-<p>When an error response as above is generated, Quaid will call a brand new
+<p>When an error response like above is generated, Quaid will call a brand new
 callback available to <code>$.ajax</code>: <code>applicationError</code>. Quaid will pass the
 errors returned from the server to this function.</p>
 
@@ -137,7 +137,7 @@ $.ajax({
 and field errors. Field errors are errors attributed to a particular form
 field. They would be the results of some form validation scheme on the server side. General
 errors are anything else. The errors in the response examples above are general errors. Quaid
-pulls field errors from general errors and passes them into your applicationError callback.</p>
+splits field errors from general errors and passes them into your applicationError callback.</p>
 
 <pre class="prettyprint">
 // Server says:
@@ -147,7 +147,7 @@ pulls field errors from general errors and passes them into your applicationErro
         {message: 'Something bad happened!'},
         {message: 'Your url is not valid', field: 'url'},
         {
-            message: 'Email address "bob@omfg.com" is already taken',
+            message: 'Address "bob@omfg.com" is already taken',
             field: 'email'
         }
     ]
@@ -158,21 +158,24 @@ $.ajax({
     applicationError: function(errorType, errors){
         // errors will be:
         // {
-        //     general: [
-        //         {message: 'Something bad happened!'}
-        //     ],
+        //     general: [{message: 'Something bad happened!'}],
         //     field: [
-        //         {message: 'Your url is not valid', field: 'url'},
-        //         {message: 'Email address "bob@omfg.com" is already taken', field: 'email'}
+        //       {message: 'Your url is not valid', field: 'url'},
+        //       {
+        //         message: 'Address "bob@omfg.com" is already taken',
+        //         field: 'email'
+        //       }
         //     ]
         // }
-        $.info('Application Error! type: ', errorType, '; errors: ', errors);
+        $.info('Application Error! type: ', errorType,
+               '; errors: ', errors);
     }
 })
 </pre>
 
 <p>You can pass any other data back from the server with your errors. At AdRoll,
-we pass back code and value fields with general errors.</p>
+we pass back code and value fields with general errors, and debug info elsewhere
+in the response.</p>
 
 <pre class="prettyprint">
 // Our server says:
@@ -181,8 +184,56 @@ we pass back code and value fields with general errors.</p>
     errors: [
         {message: 'Error!', code: 256, value: 'related to code param'},
         {message: 'Bad name', field: 'name'}
-    ]
+    ],
+    debug: {queries: 23, query_time: 0.34}
 }
+</pre>
+
+<h2 id="handling_errors">Handling Errors</h2>
+
+<p>Every error returned from the server should be marked 'handled' at some point in the
+response's callback chain. Quaid maintains a list of all the errors returned by the server. This list is wrapped by
+an object called <code>Q.asyncErrors</code>. It has a few methods</p>
+
+<pre class="prettyprint">
+// Used by the validation module.
+Q.asyncErrors.add(errors, form)
+
+// Marks an error as handled. Accepts a single error or a list of them.
+Q.asyncErrors.handle(errors) 
+
+// A way to get all the unhandled errors.
+Q.asyncErrors.getUnhandledErrors()
+
+// Clear all errors
+Q.asyncErrors.clear()
+</pre>
+
+<p>On each error response,
+<code>Q.asyncErrors.add(errors)</code> will be called and the errors will all be placed into the list.
+If you display or otherwise handle an error in your <code>applicationError</code> callback,
+you can call <code>Q.asyncErrors.handle(error)</code> on the error to notify the rest of the
+application that the error has been handled.</p>
+
+<p>Field errors will be marked automatically if you have the
+<a href="http://bassistance.de/jquery-plugins/jquery-plugin-validation/">Bassistance validation plugin</a>
+installed. Quaid will pass the them to the plugin, and Quaid's special validator will
+mark them as handled. More on that <a href="#validation">later</a>.</p>
+
+<p>At the end of the applicationError callback chain, Quaid will call a global function
+<code>Q.handleApplicationErrors</code> with all the remaining unhandled errors. This thing
+allows you to make sure no errors slip through the cracks. You are encouraged to
+override this to handle global errors in your own way. At AdRoll, we have the errors display
+in a position:fixed error container. The default behavior is to log some
+warning messages.</p>
+
+<pre class="prettyprint">
+Q.handleApplicationErrors = function(errors){
+    for(var i = 0; i < errors.length; i ++)
+        $.warn('Unhandled async application error "',
+                errors[i].message ,'" :', errors[i]);
+    Q.asyncErrors.handle(errors);
+};
 </pre>
 
 <h2 id="server_errors">Server Errors</h2>
@@ -191,9 +242,26 @@ we pass back code and value fields with general errors.</p>
 in the <code>$.ajax</code> options. Quaid doesn't mess with this. You will still get 
 <code>error</code> callbacks. You will also get <code>applicationError</code> callbacks.
 In the case of a 500+ server error, you will get a <code>applicationError</code> call with the
-first argument 'servererror'. There is a convenience method
-<code>Q.handleServerError</code> that can be replaced to handle all 500+ server errors.
-That way you can provide a nice error message to your users when they bump against an error.</p>
+first argument 'servererror'.</p>
+
+<p>After your <code>applicationError</code> function has been called
+a global method <code>Q.handleServerError</code> is called.
+
+Like <code>Q.handleApplicationErrors</code>, you are encouraged to replace <code>Q.handleServerError</code>
+with your own function to handle all 500+ server errors.
+You can provide a nice error message to your users when they bump against an error. At AdRoll,
+we display a generic message to normal users, and to engineers, we put the server's response
+in a little debug bar we wrote which will display the stack trace. Very handy.
+The default implementation will display an alert box.
+</p>
+
+<pre class="prettyprint">
+// data is the response's parsed data
+// Other options are the same as jQuery's default error callback.
+Q.handleServerError = function(data, xhr, status, errorThrown){
+    alert('Oops. An error occurred. Our team has been notified!');
+};
+</pre>
 
 <h2>Error Handling and Callback Example</h2>
 
@@ -296,23 +364,14 @@ $('#example2').AsyncForm({
 });
 </pre>
 
-<h3>Why?</h3>
-
-<p>Why would one want to catch async validation errors from the server? You are probably
-already validating things on the server side in addition to the client side. Why not use the
-results of the server side validation? (Side note: If you are not
-validating on the server side, you are Doing It Wrong.) Before I wrote this, I was having the
-server just kick out a generic 400 when it would fail validation, then relying on the
-client side for meaningful messaging. Not only was this sloppy, but sometimes the server and
-client would disagree.</p>
-
 <h3>How?</h3>
 
 <p>How does this work? Quaid's patched $.ajax function collects all the field errors when an
-error comes back from the server. It passes them to a special object called
+error comes back from the server. It passes them to 
 <code>Q.asyncErrors</code>, then revalidates the form. When the form is revalidated,
 Quaid's <code>asyncError</code> validator method will get called by the validation framework
 and will look in <code>Q.asyncErrors</code> for errors. If it finds any, it passes
-them back to the validation framework which displays them!</p>
+them back to the validation framework which displays them! It will mark any errors
+it can find a field for as handled via <code>Q.asyncError.handle()</code>.</p>
 
 {% endblock %}
