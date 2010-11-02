@@ -2,7 +2,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse
 from django.utils import simplejson as json
 from django import forms
-from decorator import decorator
+#from decorator import decorator
 
 class ClientException(Exception):
     """
@@ -27,46 +27,49 @@ def validate(form):
         return form.cleaned_data
     raise FormException(form.errors)
 
-def client_async(func, *args, **kwargs):
+def client_async(func):
     """
     A decorator to interface with async client requests,
     including returning controller exceptions.
     """
-    STATUS_FAIL = 'fail'
-    STATUS_SUCCESS = 'success'
-    status = 200
-    # run the function
-    try:
-        res = func(*args)
-        if res == True:
-            res = {u'status': STATUS_SUCCESS}
-        elif res == False:
-            res = {u'status': STATUS_FAIL}
-        else:
-            res = {
-                u'status': STATUS_SUCCESS,
-                u'results': res
-            }
-    
-    except ClientException, (e):
-        status = 400
+    def new(*args, **kwargs):
         
-        res = {'status': STATUS_FAIL}
+        STATUS_FAIL = 'fail'
+        STATUS_SUCCESS = 'success'
+        status = 200
+        # run the function
+        try:
+            res = func(*args, **kwargs)
+            if res == True:
+                res = {u'status': STATUS_SUCCESS}
+            elif res == False:
+                res = {u'status': STATUS_FAIL}
+            else:
+                res = {
+                    u'status': STATUS_SUCCESS,
+                    u'results': res
+                }
         
-        res['errors'] = [{'value': None, 'message': e.msg, 'code': e.code}]
-        if e.field:
-            res['errors'][0]['field'] = e.field
-    
-    except FormException, (e):
-        status = 400
-        res = {'status': STATUS_FAIL}
+        except ClientException, (e):
+            status = 400
+            
+            res = {'status': STATUS_FAIL}
+            
+            res['errors'] = [{'value': None, 'message': e.msg, 'code': e.code}]
+            if e.field:
+                res['errors'][0]['field'] = e.field
         
-        res['errors'] = []
-        for k, v in e.errors.items():
-            res['errors'].extend([{'value': None, 'message': unicode(msg), 'field': k} for msg in v])
+        except FormException, (e):
+            status = 400
+            res = {'status': STATUS_FAIL}
+            
+            res['errors'] = []
+            for k, v in e.errors.items():
+                res['errors'].extend([{'value': None, 'message': unicode(msg), 'field': k} for msg in v])
+        
+        return HttpResponse(json.dumps(res), status=status, mimetype='application/json')
     
-    return HttpResponse(json.dumps(res), status=status, mimetype='application/json')
-client_async = decorator(client_async)
+    return new
 
 def index(req):
     return render_to_response('quaid.html', {'form':None})
@@ -83,7 +86,6 @@ def util(req):
 def validation(req):
     return render_to_response('quaid_validation.html', {'form':None})
 
-@client_async
 def example1(req):
     
     import time
@@ -109,8 +111,8 @@ def example1(req):
         'programmers': programmers,
         'programmers_message': programmers == 0 and 'Yeah, that\'s a hardware problem' or 'Sadly, no.',
     }
+example1 = client_async(example1)
 
-@client_async
 def asyncload1(req):
     
     import time
@@ -124,8 +126,8 @@ def asyncload1(req):
         'b': '%s THIS IS B! zOMG!' % num
     }
     return types.get(t) or 'WTF y0?'
+asyncload1 = client_async(asyncload1)
 
-@client_async
 def asyncload2(req):
     
     num = int(req.POST.get('num'))
@@ -134,8 +136,8 @@ def asyncload2(req):
     time.sleep(num % 2)
     
     return str(num)
-    
-@client_async
+asyncload2 = client_async(asyncload2)
+
 def asyncform(req):
     
     name = req.POST.get('name')
@@ -148,6 +150,7 @@ def asyncform(req):
         raise ClientException('This is just an error of some kind.')
     
     return name
+asyncform = client_async(asyncform)
 
 def error_example(req):
     type = req.POST.get('errtype')
@@ -198,7 +201,6 @@ def error_example(req):
     
     return HttpResponse(json.dumps(res), status=status)
 
-@client_async
 def validation_example(req):
     
     class ExampleForm(forms.Form):
@@ -213,3 +215,4 @@ def validation_example(req):
     return {
         'email': email,
     }
+validation_example = client_async(validation_example)
