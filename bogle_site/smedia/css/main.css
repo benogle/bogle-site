@@ -176,6 +176,7 @@ div.front-page-text p {
 
 .bigline {height: 80px;}
 .bigline .icon{float: left; margin: 13px 0 0 0px;}
+.bigline .icon a{border:none;}
 
 .bigline .subject{
 	margin-left: 80px;
@@ -185,6 +186,7 @@ div.front-page-text p {
 .bigline .subject a {
     color: #282828;
     outline: 0;
+    border: none;
 }
 .bigline .subject a:hover {
     color: #000;

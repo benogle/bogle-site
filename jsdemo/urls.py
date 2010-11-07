@@ -29,5 +29,5 @@ urlpatterns = patterns('',
 
 if settings.DEBUG:
     urlpatterns += patterns('',
-        (r'^quaid/api/(.*)$', 'django.views.static.serve', { 'document_root': os.path.join(settings.PROJECT_PATH, 'doc/quaid') }),
+        (r'^doc/(.*)$', 'django.views.static.serve', { 'document_root': os.path.join(settings.PROJECT_PATH, 'doc') }),
     )
