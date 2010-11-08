@@ -107,7 +107,7 @@ def example1(req):
     return {
         'name': name,
         'mileage': miles,
-        'mileage_message': miles == 100.0 and 'Nice job!' or 'Oops try again',
+        'mileage_message': miles == 2906.0 and 'Nice job!' or 'Oops try again',
         'programmers': programmers,
         'programmers_message': programmers == 0 and 'Yeah, that\'s a hardware problem' or 'Sadly, no.',
     }
