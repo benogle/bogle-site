@@ -108,9 +108,8 @@ $(document).ready(function(){
         
         open: function(){
             var self = this;
-            self.container.animate({height: self._height}, 300, function(){
-                self.container.show();
-            });
+            self.container.show();
+            self.container.animate({height: self._height}, 300);
         }
     });
     var ftoggler = $('#ftoggled').FancyToggler({trigger: '#ftrigger'});
@@ -411,9 +410,8 @@ fancier. So we create a new plugin that overrides the open and close functions.<
     
     open: function(){
         var self = this;
-        self.container.animate({height: self._height}, 300, function(){
-            self.container.show();
-        });
+        self.container.show();
+        self.container.animate({height: self._height}, 300);
     }
 });
 var ftoggler = $('#ftoggled').FancyToggler({trigger: '#ftrigger'});</pre>

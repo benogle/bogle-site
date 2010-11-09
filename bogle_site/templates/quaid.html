@@ -52,7 +52,7 @@ $(document).ready(function(){
         },
         
         // Override Q.AsyncForm's onSuccess function
-        onSuccess: function(data){
+        _onSuccess: function(data){
         
             // We loop through the results, format the data according to
             // the formats specified in the settings, then we put the server's
@@ -244,7 +244,7 @@ Q.AsyncForm.extend('UpdateForm', {
     },
     
     // Override Q.AsyncForm's onSuccess function
-    onSuccess: function(data){
+    _onSuccess: function(data){
     
         // We loop through the results, format the data according to
         // the formats specified in the settings, then we put the
@@ -406,7 +406,7 @@ module eases the burn.</p>
     <div class="form-magic">
         <form method="post" action="/quaid/asyncform">
             <div><label>Name</label>
-            <input type="text" name="name"/></div>
+            <input type="text" name="name" class="textbox"/></div>
             
             <div><input type="submit" value="Submit"/></div>
         </form>
@@ -457,7 +457,7 @@ connects your server's async responses to the
         <form method="post" action="/quaid/validation_example">
             <div>
                 <label>Email</label>
-                <input type="text" name="email"/>
+                <input type="text" name="email" class="textbox"/>
             </div>
             
             <div><input type="submit" value="Submit"/></div>
